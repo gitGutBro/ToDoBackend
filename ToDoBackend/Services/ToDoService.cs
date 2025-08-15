@@ -1,4 +1,5 @@
-﻿using ToDoBackend.Models;
+﻿using ToDoBackend.Dtos;
+using ToDoBackend.Models;
 using ToDoBackend.Repositories;
 
 namespace ToDoBackend.Services;
@@ -31,7 +32,7 @@ public class ToDoService : IToDoService
         return _toDoRepository.AddAsync(item);
     }
 
-    public Task UpdateAsync(ToDoItem item)
+    public Task UpdateAsync(UpdateToDoItemDto item)
     {
         if (item == null)
             throw new ArgumentNullException(nameof(item), "Элемент не может быть null.");

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ToDoBackend.Dtos;
 using ToDoBackend.Models;
 using ToDoBackend.Services;
 
@@ -38,13 +39,13 @@ public class ToDoController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] ToDoItem item)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateToDoItemDto dto)
     {
-        if (id == Guid.Empty || item == null)
+        if (id == Guid.Empty || dto == null)
             return BadRequest("Идентификатор не может быть пустым и должен совпадать с идентификатором элемента.");
 
-        item.UpdateId(id);
-        await _toDoService.UpdateAsync(item);
+        dto.Id = id;
+        await _toDoService.UpdateAsync(dto);
         return NoContent();
     }
 }

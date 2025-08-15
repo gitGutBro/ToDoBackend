@@ -1,3 +1,10 @@
-﻿namespace ToDoBackend.Dtos;
+﻿using System.Text.Json.Serialization;
 
-public record class UpdateToDoItemDto(string Title, bool IsCompleted);
+namespace ToDoBackend.Dtos;
+
+public class UpdateToDoItemDto
+{
+    [JsonIgnore] public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public bool IsCompleted { get; set; } = false;
+}

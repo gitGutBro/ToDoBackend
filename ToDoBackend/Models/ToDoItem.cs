@@ -10,7 +10,7 @@ public class ToDoItem
         IsCompleted = false;
     }
 
-    public Guid Id { get; private set; }
+    public Guid Id { get; }
     public string Title { get; private set; }
     public bool IsCompleted { get; set; }
 
@@ -20,13 +20,5 @@ public class ToDoItem
             throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(newTitle));
 
         Title = newTitle;
-    }
-
-    public void UpdateId(Guid newId)
-    {
-        if (newId == Guid.Empty)
-            throw new ArgumentException("Идентификатор не может быть пустым.", nameof(newId));
-
-        Id = newId;
     }
 }
