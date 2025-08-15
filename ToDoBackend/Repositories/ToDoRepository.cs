@@ -1,4 +1,5 @@
-﻿using ToDoBackend.Models;
+﻿using ToDoBackend.Dtos;
+using ToDoBackend.Models;
 
 namespace ToDoBackend.Repositories;
 
@@ -15,24 +16,26 @@ public class ToDoRepository : IToDoRepository
     public async Task AddAsync(ToDoItem item) =>
         await Task.Run(() => _toDoItems.Add(item));
 
-    public async Task UpdateAsync(ToDoItem item) =>
-        await Task.Run(() =>
+    public Task UpdateAsync(UpdateToDoItemDto item)
+    {
+        ToDoItem? existingItem = _toDoItems.FirstOrDefault(toDoItem => toDoItem.Id == item.Id);
+
+        if (existingItem != null)
         {
-            ToDoItem? existingItem = _toDoItems.FirstOrDefault(toDoItem => toDoItem.Id == item.Id);
+            existingItem.UpdateTitle(item.Title);
+            existingItem.IsCompleted = item.IsCompleted;
+        }
 
-            if (existingItem != null)
-            {
-                existingItem.UpdateTitle(item.Title);
-                existingItem.IsCompleted = item.IsCompleted;
-            }
-        });
+        return Task.CompletedTask;
+    }
 
-    public async Task DeleteAsync(Guid id) =>
-        await Task.Run(() =>
-        {
-            ToDoItem? itemToRemove = _toDoItems.FirstOrDefault(toDoItem => toDoItem.Id == id);
+    public Task DeleteAsync(Guid id)
+    {
+        ToDoItem? itemToRemove = _toDoItems.FirstOrDefault(toDoItem => toDoItem.Id == id);
 
-            if (itemToRemove != null)
-                _toDoItems.Remove(itemToRemove);
-        });
+        if (itemToRemove != null)
+            _toDoItems.Remove(itemToRemove);
+
+        return Task.CompletedTask;
+    }
 }
