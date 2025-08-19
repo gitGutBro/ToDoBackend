@@ -1,5 +1,6 @@
 using ToDoBackend.Repositories;
 using ToDoBackend.Services;
+using ToDoBackend.Utils;
 
 try
 {
@@ -14,6 +15,7 @@ try
 
     builder.Services.AddSingleton<IToDoRepository, ToDoRepository>();
     builder.Services.AddSingleton<IToDoService, ToDoService>();
+    builder.Services.AddSingleton<CreateToDoMapper>();
 
     WebApplication app = builder.Build();
 
