@@ -24,12 +24,22 @@ public class ToDoService : IToDoService
         return _toDoRepository.GetByIdAsync(id);
     }
 
-    public Task AddAsync(ToDoItem item)
+    public async Task<ToDoItem> CreateAsync(CreateToDoItemDto dto)
     {
-        if (item == null)
-            throw new ArgumentNullException(nameof(item), "Элемент не может быть null.");
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto), "Элемент не может быть null.");
 
-        return _toDoRepository.AddAsync(item);
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(dto.Title));
+
+        await _toDoRepository.CreateAsync(dto);
+
+        ToDoItem item = new(dto.Title)
+        {
+            IsCompleted = dto.IsCompleted
+        };
+
+        return item;
     }
 
     public Task UpdateAsync(UpdateToDoItemDto item)

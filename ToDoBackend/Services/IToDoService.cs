@@ -7,7 +7,7 @@ public interface IToDoService
 {
     Task<IEnumerable<ToDoItem>> GetAllAsync();
     Task<ToDoItem?> GetByIdAsync(Guid id);
-    Task AddAsync(ToDoItem item);
+    Task<ToDoItem> CreateAsync(CreateToDoItemDto item);
     Task UpdateAsync(UpdateToDoItemDto item);
     Task DeleteAsync(Guid id);
 }

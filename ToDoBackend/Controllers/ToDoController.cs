@@ -29,13 +29,13 @@ public class ToDoController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] ToDoItem item)
+    public async Task<IActionResult> Add([FromBody] CreateToDoItemDto dto)
     {
-        if (item == null)
+        if (dto == null)
             return BadRequest("Элемент не может быть null.");
 
-        await _toDoService.AddAsync(item);
-        return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
+        ToDoItem item = await _toDoService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = item.Id }, dto);
     }
 
     [HttpPut("{id:guid}")]

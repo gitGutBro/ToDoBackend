@@ -1,6 +1,8 @@
-﻿namespace ToDoBackend.Models;
+﻿using ToDoBackend.Utils;
 
-public class ToDoItem
+namespace ToDoBackend.Models;
+
+public class ToDoItem : IMappable
 {
     public ToDoItem(string title)
     {

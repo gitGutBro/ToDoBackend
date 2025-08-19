@@ -2,9 +2,7 @@
 
 namespace ToDoBackend.Dtos;
 
-public class UpdateToDoItemDto
+public record class UpdateToDoItemDto(string Title, bool IsCompleted)
 {
     [JsonIgnore] public Guid Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public bool IsCompleted { get; set; } = false;
 }

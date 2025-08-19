@@ -1,11 +1,13 @@
 ﻿using ToDoBackend.Dtos;
 using ToDoBackend.Models;
+using ToDoBackend.Utils;
 
 namespace ToDoBackend.Repositories;
 
-public class ToDoRepository : IToDoRepository
+public class ToDoRepository(CreateToDoMapper createMapper) : IToDoRepository
 {
     private readonly List<ToDoItem> _toDoItems = [];
+    private readonly CreateToDoMapper _createMapper = createMapper;
 
     public async Task<IEnumerable<ToDoItem>> GetAllAsync() =>
         await Task.FromResult(_toDoItems);
@@ -13,8 +15,13 @@ public class ToDoRepository : IToDoRepository
     public async Task<ToDoItem?> GetByIdAsync(Guid id) =>
         await Task.FromResult(_toDoItems.FirstOrDefault(item => item.Id == id));
 
-    public async Task AddAsync(ToDoItem item) =>
-        await Task.Run(() => _toDoItems.Add(item));
+    public Task CreateAsync(CreateToDoItemDto dto)
+    {
+        ToDoItem item = _createMapper.Map(dto);
+
+        _toDoItems.Add(item);
+        return Task.CompletedTask;
+    }
 
     public Task UpdateAsync(UpdateToDoItemDto item)
     {
