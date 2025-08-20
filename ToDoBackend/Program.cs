@@ -16,6 +16,7 @@ try
     builder.Services.AddSingleton<IToDoRepository, ToDoRepository>();
     builder.Services.AddSingleton<IToDoService, ToDoService>();
     builder.Services.AddSingleton<CreateToDoMapper>();
+    builder.Services.AddSingleton<UpdateToDoMapper>();
 
     WebApplication app = builder.Build();
 

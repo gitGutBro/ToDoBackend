@@ -4,10 +4,11 @@ using ToDoBackend.Utils;
 
 namespace ToDoBackend.Repositories;
 
-public class ToDoRepository(CreateToDoMapper createMapper) : IToDoRepository
+public class ToDoRepository(CreateToDoMapper createMapper, UpdateToDoMapper updateMapper) : IToDoRepository
 {
     private readonly List<ToDoItem> _toDoItems = [];
     private readonly CreateToDoMapper _createMapper = createMapper;
+    private readonly UpdateToDoMapper _updateMapper = updateMapper;
 
     public async Task<IEnumerable<ToDoItem>> GetAllAsync() =>
         await Task.FromResult(_toDoItems);
@@ -27,11 +28,7 @@ public class ToDoRepository(CreateToDoMapper createMapper) : IToDoRepository
     {
         ToDoItem? existingItem = _toDoItems.FirstOrDefault(toDoItem => toDoItem.Id == item.Id);
 
-        if (existingItem != null)
-        {
-            existingItem.UpdateTitle(item.Title);
-            existingItem.IsCompleted = item.IsCompleted;
-        }
+        _updateMapper.Update(existingItem!, item);
 
         return Task.CompletedTask;
     }
