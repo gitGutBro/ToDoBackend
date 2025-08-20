@@ -1,4 +1,4 @@
-﻿namespace ToDoBackend.Utils;
+﻿namespace ToDoBackend.Mappers;
 
 public abstract class Mapper<TMappable, TDto> where TMappable : IMappable
 {

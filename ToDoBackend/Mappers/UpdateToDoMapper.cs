@@ -1,7 +1,7 @@
 ﻿using ToDoBackend.Dtos;
 using ToDoBackend.Models;
 
-namespace ToDoBackend.Utils;
+namespace ToDoBackend.Mappers;
 
 public class UpdateToDoMapper : Mapper<ToDoItem, UpdateToDoItemDto>
 {

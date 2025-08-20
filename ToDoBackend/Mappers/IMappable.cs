@@ -1,3 +1,3 @@
-﻿namespace ToDoBackend.Utils;
+﻿namespace ToDoBackend.Mappers;
 
 public interface IMappable;
