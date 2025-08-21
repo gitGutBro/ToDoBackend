@@ -1,8 +1,6 @@
-﻿using ToDoBackend.Mappers;
+﻿namespace ToDoBackend.Models;
 
-namespace ToDoBackend.Models;
-
-public class ToDoItem : IMappable
+public class ToDoItem : IModel
 {
     public ToDoItem(string title)
     {

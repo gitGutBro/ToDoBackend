@@ -3,15 +3,15 @@ using ToDoBackend.Models;
 
 namespace ToDoBackend.Mappers;
 
-public class CreateToDoMapper : Mapper<ToDoItem, CreateToDoItemDto>
+public class CreateToDoMapper : IMapper<ToDoItem, CreateToDoItemDto>
 {
-    public override ToDoItem Map(CreateToDoItemDto dto)
+    public ToDoItem MapToModel(CreateToDoItemDto dto)
     {
         if (dto == null)
             throw new ArgumentNullException(nameof(dto), "DTO не может быть null.");
 
         if (string.IsNullOrWhiteSpace(dto.Title))
-            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(dto.Title));
+            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(dto));
 
         return new ToDoItem(dto.Title)
         {
@@ -19,13 +19,13 @@ public class CreateToDoMapper : Mapper<ToDoItem, CreateToDoItemDto>
         };
     }
 
-    public override CreateToDoItemDto Map(ToDoItem mappable)
+    public CreateToDoItemDto MapToDto(ToDoItem mappable)
     {
         if (mappable == null)
             throw new ArgumentNullException(nameof(mappable), "Маппируемый объект не может быть null.");
 
         if (string.IsNullOrWhiteSpace(mappable.Title))
-            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(mappable.Title));
+            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(mappable));
 
         return new CreateToDoItemDto(mappable.Title, mappable.IsCompleted);
     }

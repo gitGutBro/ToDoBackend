@@ -1,4 +1,5 @@
 ﻿using ToDoBackend.Dtos;
+using ToDoBackend.Mappers;
 using ToDoBackend.Models;
 using ToDoBackend.Repositories;
 
@@ -7,14 +8,18 @@ namespace ToDoBackend.Services;
 public class ToDoService : IToDoService
 {
     private readonly IToDoRepository _toDoRepository;
+    private readonly CreateToDoMapper _createMapper;
+    private readonly UpdateToDoMapper _updateMapper;
 
-    public ToDoService(IToDoRepository toDoRepository) => 
-        _toDoRepository = toDoRepository ?? throw new ArgumentNullException(nameof(toDoRepository));
-
-    public async Task<IEnumerable<ToDoItem>> GetAllAsync()
+    public ToDoService(IToDoRepository toDoRepository, CreateToDoMapper createMapper, UpdateToDoMapper updateMapper)
     {
-        return await _toDoRepository.GetAllAsync();
+        _toDoRepository = toDoRepository ?? throw new ArgumentNullException(nameof(toDoRepository));
+        _createMapper = createMapper ?? throw new ArgumentNullException(nameof(createMapper));
+        _updateMapper = updateMapper ?? throw new ArgumentNullException(nameof(updateMapper));
     }
+
+    public async Task<IEnumerable<ToDoItem>> GetAllAsync() =>
+        await _toDoRepository.GetAllAsync();
 
     public Task<ToDoItem?> GetByIdAsync(Guid id)
     {
@@ -26,28 +31,18 @@ public class ToDoService : IToDoService
 
     public async Task<ToDoItem> CreateAsync(CreateToDoItemDto dto)
     {
-        if (dto == null)
-            throw new ArgumentNullException(nameof(dto), "Элемент не может быть null.");
+        ToDoItem item = _createMapper.MapToModel(dto);
 
-        if (string.IsNullOrWhiteSpace(dto.Title))
-            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(dto.Title));
-
-        await _toDoRepository.CreateAsync(dto);
-
-        ToDoItem item = new(dto.Title)
-        {
-            IsCompleted = dto.IsCompleted
-        };
-
+        await _toDoRepository.CreateAsync(item);
         return item;
     }
 
-    public Task UpdateAsync(UpdateToDoItemDto item)
+    public async Task UpdateAsync(Guid id, UpdateToDoItemDto dto)
     {
-        if (item == null)
-            throw new ArgumentNullException(nameof(item), "Элемент не может быть null.");
-        
-        return _toDoRepository.UpdateAsync(item);
+        ToDoItem? item = await _toDoRepository.GetByIdAsync(id);
+
+        _updateMapper.UpdateModel(item, dto);
+        await _toDoRepository.UpdateAsync(item);
     }
 
     public Task DeleteAsync(Guid id)

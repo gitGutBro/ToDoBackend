@@ -44,8 +44,7 @@ public class ToDoController : ControllerBase
         if (id == Guid.Empty || dto == null)
             return BadRequest("Идентификатор не может быть пустым и должен совпадать с идентификатором элемента.");
 
-        dto.Id = id;
-        await _toDoService.UpdateAsync(dto);
+        await _toDoService.UpdateAsync(id, dto);
         return NoContent();
     }
 }

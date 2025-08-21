@@ -1,7 +1,9 @@
-﻿namespace ToDoBackend.Mappers;
+﻿using ToDoBackend.Models;
 
-public abstract class Mapper<TMappable, TDto> where TMappable : IMappable
+namespace ToDoBackend.Mappers;
+
+public interface IMapper<TMappable, TDto> where TMappable : IModel
 {
-    public abstract TMappable Map(TDto dto);
-    public abstract TDto Map(TMappable mappable);
+    public abstract TMappable MapToModel(TDto dto);
+    public abstract TDto MapToDto(TMappable mappable);
 }

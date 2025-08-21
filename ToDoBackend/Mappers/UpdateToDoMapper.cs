@@ -3,15 +3,15 @@ using ToDoBackend.Models;
 
 namespace ToDoBackend.Mappers;
 
-public class UpdateToDoMapper : Mapper<ToDoItem, UpdateToDoItemDto>
+public class UpdateToDoMapper : IMapper<ToDoItem, UpdateToDoItemDto>
 {
-    public override ToDoItem Map(UpdateToDoItemDto dto)
+    public ToDoItem MapToModel(UpdateToDoItemDto dto)
     {
-        if (dto == null)
+        if (dto is null)
             throw new ArgumentNullException(nameof(dto), "DTO не может быть null.");
 
         if (string.IsNullOrWhiteSpace(dto.Title))
-            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(dto.Title));
+            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(dto));
 
         return new ToDoItem(dto.Title)
         {
@@ -19,18 +19,18 @@ public class UpdateToDoMapper : Mapper<ToDoItem, UpdateToDoItemDto>
         };
     }
 
-    public override UpdateToDoItemDto Map(ToDoItem mappable)
+    public UpdateToDoItemDto MapToDto(ToDoItem mappable)
     {
-        if (mappable == null)
+        if (mappable is null)
             throw new ArgumentNullException(nameof(mappable), "Маппируемый объект не может быть null.");
 
         if (string.IsNullOrWhiteSpace(mappable.Title))
-            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(mappable.Title));
+            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(mappable));
 
         return new UpdateToDoItemDto(mappable.Title, mappable.IsCompleted);
     }
 
-    public void Update(ToDoItem item, UpdateToDoItemDto dto)
+    public void UpdateModel(ToDoItem item, UpdateToDoItemDto dto)
     {
         if (item == null)
             throw new ArgumentNullException(nameof(item), "Маппируемый объект не может быть null.");
