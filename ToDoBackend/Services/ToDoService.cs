@@ -21,13 +21,8 @@ public class ToDoService : IToDoService
     public async Task<IEnumerable<ToDoItem>> GetAllAsync() =>
         await _toDoRepository.GetAllAsync();
 
-    public Task<ToDoItem?> GetByIdAsync(Guid id)
-    {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Идентификатор не может быть пустым.", nameof(id));
-
-        return _toDoRepository.GetByIdAsync(id);
-    }
+    public Task<ToDoItem?> GetByIdAsync(Guid id) =>
+        _toDoRepository.GetByIdAsync(id);
 
     public async Task<ToDoItem> CreateAsync(CreateToDoItemDto dto)
     {
@@ -45,11 +40,6 @@ public class ToDoService : IToDoService
         await _toDoRepository.UpdateAsync(item);
     }
 
-    public Task DeleteAsync(Guid id)
-    {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Идентификатор не может быть пустым.", nameof(id));
-
-        return _toDoRepository.DeleteAsync(id);
-    }
+    public Task DeleteAsync(Guid id) =>
+        _toDoRepository.DeleteAsync(id);
 }
