@@ -25,7 +25,7 @@ public class ToDoRepository : IToDoRepository
     {
         ToDoItem? itemToRemove = await GetByIdAsync(id);
 
-        if (itemToRemove != null)
+        if (itemToRemove is not null)
             _toDoItems.Remove(itemToRemove);
     }
 }
