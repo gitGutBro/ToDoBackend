@@ -2,6 +2,9 @@
 
 public sealed record class Title
 {
+    const int MinTitleLength = 1;
+    const int MaxTitleLength = 100;
+
     public Title(string title) => 
         SetValue(title);
 
@@ -12,6 +15,8 @@ public sealed record class Title
 
     public void SetValue(string newValue)
     {
+        newValue = newValue.Trim();
+
         ValidateArgument(newValue);
 
         Value = newValue;
@@ -20,6 +25,12 @@ public sealed record class Title
     private static void ValidateArgument(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException("Заголовок задачи не может быть пустым.", nameof(value));
+            throw new ArgumentException("Заголовок задачи не может быть пустым!", nameof(value));
+
+        if (value.Length < MinTitleLength)
+            throw new ArgumentOutOfRangeException($"Минимальное количество символов для задачи: {MinTitleLength}");
+
+        if (value.Length > MaxTitleLength)
+            throw new ArgumentOutOfRangeException($"Максимальное количество символов для задачи: {MaxTitleLength}");
     }
 }
