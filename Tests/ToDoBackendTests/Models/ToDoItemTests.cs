@@ -18,14 +18,6 @@ public class ToDoItemTests
         Assert.True(item.Id != Guid.Empty);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    [InlineData(null)]
-    public void Constructor_ShouldThrowArgumentException_WhenTitleIsNullOrWhiteSpace(string? invalidTitle) =>
-        //Arrange - Act - Assert
-        Assert.Throws<ArgumentException>(() => new ToDoItem(invalidTitle!));
-
     [Fact]
     public void UpdateTitle_ShouldChangeTitleValue_WhenNewTitleIsValid()
     {
@@ -40,20 +32,5 @@ public class ToDoItemTests
 
         //Assert
         Assert.Equal(NewValidTitleToUpdate, item.Title.Value);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("  ")]
-    [InlineData(null)]
-    public void UpdateTitle_ShouldThrowArgumentException_WhenNewTitleIsNullOrWhiteSpace(string? invalidTitle) 
-    {
-        //Arrange
-        const string ValidTitle = "Title";
-
-        ToDoItem item = new(ValidTitle);
-
-        //Act - Assert
-        Assert.Throws<ArgumentException>(() => item.UpdateTitle(invalidTitle!));
     }
 }

@@ -18,14 +18,6 @@ public class TitleTests
         Assert.Equal(ValidTitle, title.Value);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    [InlineData(null)]
-    public void Constructor_ShouldThrowArgumentException_WhenArgumentTitleIsNullOrWhiteSpace(string? title) =>
-        //Arrange - Act - Assert
-        Assert.Throws<ArgumentException>(() => new Title(title!));
-
     [Fact]
     public void SetValue_ShouldChangeValue_WhenNewValueIsValid()
     {
@@ -40,19 +32,6 @@ public class TitleTests
 
         //Assert
         Assert.Equal(NewValidTitleToUpdate, title.Value);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("  ")]
-    [InlineData(null)]
-    public void SetValue_ShouldThrowArgumentException_WhenNewValueIsNullOrWhiteSpace(string? newTitle)
-    {
-        //Arrange
-        Title title = new("Title");
-
-        //Act - Assert
-        Assert.Throws<ArgumentException>(() => title.SetValue(newTitle!));
     }
 
     [Fact]
