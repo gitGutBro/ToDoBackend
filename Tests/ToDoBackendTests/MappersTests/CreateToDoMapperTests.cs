@@ -25,7 +25,7 @@ public class CreateToDoMapperTests
     }
 
     [Fact]
-    public void ModelToMap_ShouldMapCorrectly_WhenMappingCalled()
+    public void MapToDto_ShouldMapCorrectly_WhenMappingCalled()
     {
         //Arrange
         CreateToDoMapper mapper = new();
@@ -37,7 +37,7 @@ public class CreateToDoMapperTests
         CreateToDoItemDto createDto = mapper.MapToDto(model);
 
         //Assert
-        Assert.Equal(createDto.Title, model.Title);
-        Assert.Equal(createDto.IsCompleted, model.IsCompleted);
+        Assert.Equal(model.Title, createDto.Title);
+        Assert.Equal(model.IsCompleted, createDto.IsCompleted);
     }
 }

@@ -103,8 +103,8 @@ public class ToDoServiceTests
         Assert.NotNull(itemToCreate);
         Assert.NotNull(createdItem);
         Assert.Equal(itemToCreate.Id, createdItem.Id);
-        Assert.Equal(itemToCreate.Title, itemToCreate.Title);
-        Assert.Equal(itemToCreate.IsCompleted, itemToCreate.IsCompleted);
+        Assert.Equal(itemToCreate.Title, createdItem.Title);
+        Assert.Equal(itemToCreate.IsCompleted, createdItem.IsCompleted);
     }
 
     [Fact]

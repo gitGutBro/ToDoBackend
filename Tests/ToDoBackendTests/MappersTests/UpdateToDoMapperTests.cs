@@ -34,10 +34,10 @@ public class UpdateToDoMapperTests
         ToDoItem model = new(ValidTitle);
 
         //Act
-        UpdateToDoItemDto createDto = mapper.MapToDto(model);
+        UpdateToDoItemDto updateDto = mapper.MapToDto(model);
 
         //Assert
-        Assert.Equal(createDto.Title, model.Title);
-        Assert.Equal(createDto.IsCompleted, model.IsCompleted);
+        Assert.Equal(updateDto.Title, model.Title);
+        Assert.Equal(updateDto.IsCompleted, model.IsCompleted);
     }
 }
