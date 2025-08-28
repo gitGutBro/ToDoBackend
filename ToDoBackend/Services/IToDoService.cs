@@ -1,13 +1,14 @@
 ﻿using ToDoBackend.Dtos;
 using ToDoBackend.Models;
+using ToDoBackend.ResultPattern;
 
 namespace ToDoBackend.Services;
 
 public interface IToDoService
 {
-    Task<IEnumerable<ToDoItem>> GetAllAsync(CancellationToken cancelToken);
-    Task<ToDoItem?> GetByIdAsync(Guid id, CancellationToken cancelToken);
-    Task<ToDoItem> CreateAsync(CreateToDoItemDto item, CancellationToken cancelToken);
-    Task UpdateAsync(Guid id, UpdateToDoItemDto item, CancellationToken cancelToken);
-    Task DeleteAsync(Guid id, CancellationToken cancelToken);
+    Task<Result<IEnumerable<ToDoItem>>> GetAllAsync(CancellationToken cancelToken);
+    Task<Result<ToDoItem?>> GetByIdAsync(Guid id, CancellationToken cancelToken);
+    Task<Result<ToDoItem>> CreateAsync(CreateToDoItemDto item, CancellationToken cancelToken);
+    Task<Result<ToDoItem>> UpdateAsync(Guid id, UpdateToDoItemDto item, CancellationToken cancelToken);
+    Task<Result<ToDoItem>> DeleteAsync(Guid id, CancellationToken cancelToken);
 }
