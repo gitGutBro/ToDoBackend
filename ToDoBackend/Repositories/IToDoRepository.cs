@@ -1,13 +1,12 @@
-﻿using ToDoBackend.Dtos;
-using ToDoBackend.Models;
+﻿using ToDoBackend.Models;
 
 namespace ToDoBackend.Repositories;
 
 public interface IToDoRepository
 {
-    Task<IEnumerable<ToDoItem>> GetAllAsync();
-    Task<ToDoItem?> GetByIdAsync(Guid id);
-    Task CreateAsync(ToDoItem item);
-    Task UpdateAsync(ToDoItem item);
-    Task DeleteAsync(Guid id);
+    Task<IEnumerable<ToDoItem>> GetAllAsync(CancellationToken cancelToken);
+    Task<ToDoItem?> GetByIdAsync(Guid id, CancellationToken cancelToken);
+    Task CreateAsync(ToDoItem item, CancellationToken cancelToken);
+    Task UpdateAsync(ToDoItem item, CancellationToken cancelToken);
+    Task DeleteAsync(Guid id, CancellationToken cancelToken);
 }

@@ -1,4 +1,5 @@
-﻿using ToDoBackend.Dtos;
+﻿using System.Threading;
+using ToDoBackend.Dtos;
 using ToDoBackend.Mappers;
 using ToDoBackend.Models;
 using ToDoBackend.Repositories;
@@ -18,38 +19,50 @@ public class ToDoService : IToDoService
         _updateMapper = updateMapper ?? throw new ArgumentNullException(nameof(updateMapper));
     }
 
-    public async Task<IEnumerable<ToDoItem>> GetAllAsync() =>
-        await _toDoRepository.GetAllAsync();
+    public async Task<IEnumerable<ToDoItem>> GetAllAsync(CancellationToken cancelToken) =>
+        await _toDoRepository.GetAllAsync(cancelToken);
 
-    public Task<ToDoItem?> GetByIdAsync(Guid id)
+    public Task<ToDoItem?> GetByIdAsync(Guid id, CancellationToken cancelToken)
     {
         if (id == Guid.Empty)
             throw new ArgumentException("Идентификатор не может быть пустым.", nameof(id));
 
-        return _toDoRepository.GetByIdAsync(id);
+        if (cancelToken.IsCancellationRequested)
+            return Task.FromCanceled<ToDoItem?>(cancelToken);
+
+        return _toDoRepository.GetByIdAsync(id, cancelToken);
     }
 
-    public async Task<ToDoItem> CreateAsync(CreateToDoItemDto dto)
+    public async Task<ToDoItem> CreateAsync(CreateToDoItemDto dto, CancellationToken cancelToken)
     {
+        if (cancelToken.IsCancellationRequested)
+            cancelToken.ThrowIfCancellationRequested();
+
         ToDoItem item = _createMapper.MapToModel(dto);
 
-        await _toDoRepository.CreateAsync(item);
+        await _toDoRepository.CreateAsync(item, cancelToken);
         return item;
     }
 
-    public async Task UpdateAsync(Guid id, UpdateToDoItemDto dto)
+    public async Task UpdateAsync(Guid id, UpdateToDoItemDto dto, CancellationToken cancelToken)
     {
-        ToDoItem? item = await _toDoRepository.GetByIdAsync(id);
+        if (cancelToken.IsCancellationRequested)
+            cancelToken.ThrowIfCancellationRequested();
+
+        ToDoItem? item = await _toDoRepository.GetByIdAsync(id, cancelToken);
 
         _updateMapper.UpdateModel(item, dto);
-        await _toDoRepository.UpdateAsync(item);
+        await _toDoRepository.UpdateAsync(item, cancelToken);
     }
 
-    public Task DeleteAsync(Guid id)
+    public Task DeleteAsync(Guid id, CancellationToken cancelToken)
     {
         if (id == Guid.Empty)
             throw new ArgumentException("Идентификатор не может быть пустым.", nameof(id));
 
-        return _toDoRepository.DeleteAsync(id);
+        if (cancelToken.IsCancellationRequested)
+            return Task.FromCanceled(cancelToken);
+
+        return _toDoRepository.DeleteAsync(id, cancelToken);
     }
 }

@@ -5,9 +5,9 @@ namespace ToDoBackend.Services;
 
 public interface IToDoService
 {
-    Task<IEnumerable<ToDoItem>> GetAllAsync();
-    Task<ToDoItem?> GetByIdAsync(Guid id);
-    Task<ToDoItem> CreateAsync(CreateToDoItemDto item);
-    Task UpdateAsync(Guid id, UpdateToDoItemDto item);
-    Task DeleteAsync(Guid id);
+    Task<IEnumerable<ToDoItem>> GetAllAsync(CancellationToken cancelToken);
+    Task<ToDoItem?> GetByIdAsync(Guid id, CancellationToken cancelToken);
+    Task<ToDoItem> CreateAsync(CreateToDoItemDto item, CancellationToken cancelToken);
+    Task UpdateAsync(Guid id, UpdateToDoItemDto item, CancellationToken cancelToken);
+    Task DeleteAsync(Guid id, CancellationToken cancelToken);
 }
