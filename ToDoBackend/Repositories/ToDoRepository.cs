@@ -1,4 +1,6 @@
-﻿using ToDoBackend.Models;
+﻿using System.Threading;
+using ToDoBackend.Models;
+using ToDoBackend.ResultPattern;
 
 namespace ToDoBackend.Repositories;
 
@@ -6,26 +8,53 @@ public class ToDoRepository : IToDoRepository
 {
     private readonly List<ToDoItem> _toDoItems = [];
 
-    public async Task<IEnumerable<ToDoItem>> GetAllAsync() =>
-        await Task.FromResult(_toDoItems);
-
-    public async Task<ToDoItem?> GetByIdAsync(Guid id) =>
-        await Task.FromResult(_toDoItems.FirstOrDefault(item => item.Id == id));
-
-    public Task CreateAsync(ToDoItem item)
+    public Task<Result<IEnumerable<ToDoItem>>> GetAllAsync(CancellationToken cancelToken)
     {
-        _toDoItems.Add(item);
-        return Task.CompletedTask;
+        if (cancelToken.IsCancellationRequested)
+            return Task.FromCanceled<Result<IEnumerable<ToDoItem>>>(cancelToken);
+
+        return Task.FromResult(Result<IEnumerable<ToDoItem>>.Success(_toDoItems));
     }
 
-    public Task UpdateAsync(ToDoItem item) =>
-        Task.CompletedTask;
-
-    public async Task DeleteAsync(Guid id)
+    public Task<Result<ToDoItem?>> GetByIdAsync(Guid id, CancellationToken cancelToken)
     {
-        ToDoItem? itemToRemove = await GetByIdAsync(id);
+        if (cancelToken.IsCancellationRequested)
+            return Task.FromCanceled<Result<ToDoItem?>>(cancelToken);
 
-        if (itemToRemove != null)
-            _toDoItems.Remove(itemToRemove);
+        ToDoItem? result = _toDoItems.FirstOrDefault(item => item.Id == id);
+
+        return Task.FromResult(Result<ToDoItem?>.Success(result));
+    }
+
+    public Task<Result<ToDoItem>> CreateAsync(ToDoItem item, CancellationToken cancelToken)
+    {
+        if (cancelToken.IsCancellationRequested)
+            return Task.FromCanceled<Result<ToDoItem>>(cancelToken);
+
+        _toDoItems.Add(item);
+
+        return Task.FromResult(Result<ToDoItem>.Success(item));
+    }
+
+    public Task<Result<ToDoItem>> UpdateAsync(ToDoItem item, CancellationToken cancelToken)
+    {
+        if (cancelToken.IsCancellationRequested)
+            return Task.FromCanceled<Result<ToDoItem>>(cancelToken);
+
+        return Task.FromResult(Result<ToDoItem>.Success(item));
+    }
+
+    public Task<Result<ToDoItem>> DeleteAsync(Guid id, CancellationToken cancelToken)
+    {
+        if (cancelToken.IsCancellationRequested)
+            return Task.FromCanceled<Result<ToDoItem>>(cancelToken);
+
+        ToDoItem? item = _toDoItems.FirstOrDefault(item => item.Id == id);
+
+        if (item is null)
+            return Task.FromResult(Result<ToDoItem>.Failure(ToDoErrors.NotFound));
+
+        _toDoItems.Remove(item);
+        return Task.FromResult(Result<ToDoItem>.Success(item));
     }
 }
