@@ -3,6 +3,7 @@ using ToDoBackend.Mappers;
 using ToDoBackend.Models;
 using ToDoBackend.Repositories;
 using ToDoBackend.Services;
+using ToDoBackend.Validators;
 using Xunit;
 
 namespace Tests.ToDoBackendTests.Services;
@@ -20,10 +21,11 @@ public class ToDoServiceTests
         CreateToDoItemDto secondDto = new(SecondValidTitle, false);
 
         IToDoRepository repository = new ToDoRepository();
+        ToDoItemValidator validator = new();
         CreateToDoMapper createMapper = new();
         UpdateToDoMapper updateMapper = new();
 
-        IToDoService service = new ToDoService(repository, createMapper, updateMapper);
+        IToDoService service = new ToDoService(repository, validator, createMapper, updateMapper);
 
         //Act
         ToDoItem firstItem = await service.CreateAsync(firstDto);
@@ -41,11 +43,11 @@ public class ToDoServiceTests
     {
         //Arrange
         IToDoRepository repository = new ToDoRepository();
-
+        ToDoItemValidator validator = new();
         CreateToDoMapper createMapper = new();
         UpdateToDoMapper updateMapper = new();
 
-        IToDoService service = new ToDoService(repository, createMapper, updateMapper);
+        IToDoService service = new ToDoService(repository, validator, createMapper, updateMapper);
 
         const string ValidTitle = "Title";
         CreateToDoItemDto dto = new(ValidTitle, false);
@@ -67,11 +69,11 @@ public class ToDoServiceTests
     {
         //Arrange
         IToDoRepository repository = new ToDoRepository();
-
+        ToDoItemValidator validator = new();
         CreateToDoMapper createMapper = new();
         UpdateToDoMapper updateMapper = new();
 
-        IToDoService service = new ToDoService(repository, createMapper, updateMapper);
+        IToDoService service = new ToDoService(repository, validator, createMapper, updateMapper);
         Guid nonExistentId = Guid.NewGuid();
 
         //Act
@@ -86,11 +88,11 @@ public class ToDoServiceTests
     {
         //Arrange
         IToDoRepository repository = new ToDoRepository();
-
+        ToDoItemValidator validator = new();
         CreateToDoMapper createMapper = new();
         UpdateToDoMapper updateMapper = new();
 
-        IToDoService service = new ToDoService(repository, createMapper, updateMapper);
+        IToDoService service = new ToDoService(repository, validator, createMapper, updateMapper);
 
         const string ValidTitle = nameof(ValidTitle);
         CreateToDoItemDto createDto = new(ValidTitle, false); 
@@ -112,11 +114,11 @@ public class ToDoServiceTests
     {
         //Arrange
         IToDoRepository repository = new ToDoRepository();
-
+        ToDoItemValidator validator = new();
         CreateToDoMapper createMapper = new();
         UpdateToDoMapper updateMapper = new();
 
-        IToDoService service = new ToDoService(repository, createMapper, updateMapper);
+        IToDoService service = new ToDoService(repository, validator, createMapper, updateMapper);
 
         const string FirstValidTitle = nameof(FirstValidTitle);
         CreateToDoItemDto createDto = new(FirstValidTitle, false);
@@ -140,11 +142,11 @@ public class ToDoServiceTests
     {
         //Arrange
         IToDoRepository repository = new ToDoRepository();
-
+        ToDoItemValidator validator = new();
         CreateToDoMapper createMapper = new();
         UpdateToDoMapper updateMapper = new();
 
-        IToDoService service = new ToDoService(repository, createMapper, updateMapper);
+        IToDoService service = new ToDoService(repository, validator, createMapper, updateMapper);
 
         const string ValidTitle = nameof(ValidTitle);
         CreateToDoItemDto createDto = new(ValidTitle, false);
