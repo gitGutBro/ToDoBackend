@@ -1,18 +1,11 @@
 ﻿namespace ToDoBackend.Models;
 
-public class ToDoItem : IModel
+public class ToDoItem(string title) : IModel
 {
-    public ToDoItem(string title)
-    {
-        Id = Guid.NewGuid();
-        Title = title;
-        IsCompleted = false;
-    }
-
-    public Guid Id { get; }
-    public string Title { get; private set; }
-    public bool IsCompleted { get; set; }
+    public Guid Id { get; } = Guid.NewGuid();
+    public Title Title { get; } = new Title(title.Trim());
+    public bool IsCompleted { get; set; } = false;
 
     public void UpdateTitle(string newTitle) => 
-        Title = newTitle.Trim();
+        Title.SetValue(newTitle);
 }

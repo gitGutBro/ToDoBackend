@@ -20,7 +20,8 @@ public class ToDoService(IToDoRepository toDoRepository,
     public async Task<IEnumerable<ToDoItem>> GetAllAsync() =>
         await _toDoRepository.GetAllAsync();
 
-    public Task<ToDoItem?> GetByIdAsync(Guid id) => 
+
+    public Task<ToDoItem?> GetByIdAsync(Guid id) =>
         _toDoRepository.GetByIdAsync(id);
 
     public async Task<ToDoItem> CreateAsync(CreateToDoItemDto dto)

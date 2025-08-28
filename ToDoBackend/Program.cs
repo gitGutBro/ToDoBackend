@@ -46,3 +46,5 @@ finally
 {
     Console.WriteLine("Application has stopped.");
 }
+
+public partial class Program;
