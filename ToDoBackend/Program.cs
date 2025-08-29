@@ -1,6 +1,7 @@
 using ToDoBackend.Mappers;
 using ToDoBackend.Repositories;
 using ToDoBackend.Services;
+using ToDoBackend.Validators;
 
 try
 {
@@ -15,6 +16,7 @@ try
 
     builder.Services.AddSingleton<IToDoRepository, ToDoRepository>();
     builder.Services.AddSingleton<IToDoService, ToDoService>();
+    builder.Services.AddSingleton<ToDoItemValidator>();
     builder.Services.AddSingleton<CreateToDoMapper>();
     builder.Services.AddSingleton<UpdateToDoMapper>();
 
@@ -44,3 +46,5 @@ finally
 {
     Console.WriteLine("Application has stopped.");
 }
+
+public partial class Program;

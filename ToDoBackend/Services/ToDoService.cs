@@ -1,14 +1,20 @@
-﻿using ToDoBackend.Dtos;
+﻿using FluentValidation.Results;
+using ToDoBackend.Dtos;
 using ToDoBackend.Mappers;
 using ToDoBackend.Models;
+using ToDoBackend.Validators;
 using ToDoBackend.Repositories;
 using ToDoBackend.ResultPattern;
 
 namespace ToDoBackend.Services;
 
-public class ToDoService(IToDoRepository toDoRepository, CreateToDoMapper createMapper, UpdateToDoMapper updateMapper) : IToDoService
+public class ToDoService(IToDoRepository toDoRepository,
+                         ToDoItemValidator validator,
+                         CreateToDoMapper createMapper, 
+                         UpdateToDoMapper updateMapper) : IToDoService
 {
     private readonly IToDoRepository _toDoRepository = toDoRepository ?? throw new ArgumentNullException(nameof(toDoRepository));
+    private readonly ToDoItemValidator _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     private readonly CreateToDoMapper _createMapper = createMapper ?? throw new ArgumentNullException(nameof(createMapper));
     private readonly UpdateToDoMapper _updateMapper = updateMapper ?? throw new ArgumentNullException(nameof(updateMapper));
 
@@ -35,7 +41,11 @@ public class ToDoService(IToDoRepository toDoRepository, CreateToDoMapper create
 
         ToDoItem item = _createMapper.MapToModel(dto);
 
+        ValidationResult validationResults = _validator.Validate(item);
+        CheckValidation(validationResults);
+        
         return _toDoRepository.CreateAsync(item, cancelToken);
+
     }
 
     public async Task<Result<ToDoItem>> UpdateAsync(Guid id, UpdateToDoItemDto dto, CancellationToken cancelToken)
@@ -44,6 +54,9 @@ public class ToDoService(IToDoRepository toDoRepository, CreateToDoMapper create
             cancelToken.ThrowIfCancellationRequested();
 
         Result<ToDoItem?> getResult = await _toDoRepository.GetByIdAsync(id, cancelToken);
+
+        ValidationResult validationResults = _validator.Validate(item);
+        CheckValidation(validationResults);
 
         Task<Result<ToDoItem>> matchResult = getResult.Match(
             existingToDo =>
@@ -69,5 +82,16 @@ public class ToDoService(IToDoRepository toDoRepository, CreateToDoMapper create
             return Task.FromCanceled<Result<ToDoItem>>(cancelToken);
 
         return _toDoRepository.DeleteAsync(id, cancelToken);
+    }
+
+    private static void CheckValidation(ValidationResult results)
+    {
+        if (results.IsValid == false)
+        {
+            foreach (ValidationFailure? failure in results.Errors)
+                Console.WriteLine($"Property {failure.PropertyName} failed validation. Error was: {failure.ErrorMessage}");
+
+            throw new FluentValidation.ValidationException(results.Errors);
+        }
     }
 }
