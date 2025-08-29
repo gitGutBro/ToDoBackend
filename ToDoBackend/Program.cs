@@ -1,7 +1,17 @@
+using Serilog;
 using ToDoBackend.Mappers;
 using ToDoBackend.Repositories;
 using ToDoBackend.Services;
 using ToDoBackend.Validators;
+
+const string LogFormat = "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} :: {Message:lj}{NewLine}{Exception}";
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console(outputTemplate: LogFormat)
+    .WriteTo.File($"logs/logs-.txt", rollingInterval: RollingInterval.Day)
+    .Enrich.FromLogContext()
+    .MinimumLevel.Debug()
+    .CreateLogger();
 
 try
 {
@@ -9,6 +19,7 @@ try
 
     // Add services to the container.
 
+    builder.Host.UseSerilog();
     builder.Services.AddControllers();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
@@ -21,6 +32,8 @@ try
     builder.Services.AddSingleton<UpdateToDoMapper>();
 
     WebApplication app = builder.Build();
+
+    app.UseSerilogRequestLogging();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
@@ -39,12 +52,12 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"An error occurred: {ex.Message}");
-    Environment.Exit(1);
+    Log.Fatal(ex, "Application start-up failed");
+    throw;
 }
 finally
 {
-    Console.WriteLine("Application has stopped.");
+    Log.CloseAndFlush();
 }
 
 public partial class Program;
