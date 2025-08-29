@@ -73,14 +73,4 @@ public class ToDoController(IToDoService toDoService) : ControllerBase
             cancelToken
         );
     }
-
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        if (id == Guid.Empty)
-            return BadRequest("Идентификатор не может быть пустым.");
-
-        await _toDoService.DeleteAsync(id);
-        return NoContent();
-    }
 }
