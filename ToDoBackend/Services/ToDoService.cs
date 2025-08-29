@@ -5,6 +5,7 @@ using ToDoBackend.Models;
 using ToDoBackend.Validators;
 using ToDoBackend.Repositories;
 using ToDoBackend.ResultPattern;
+using ToDoBackend.Extensions;
 
 namespace ToDoBackend.Services;
 
@@ -42,7 +43,7 @@ public class ToDoService(IToDoRepository toDoRepository,
         ToDoItem item = _createMapper.MapToModel(dto);
 
         ValidationResult validationResults = _validator.Validate(item);
-        CheckValidation(validationResults);
+        validationResults.CheckValidation();
         
         return _toDoRepository.CreateAsync(item, cancelToken);
 
@@ -55,8 +56,6 @@ public class ToDoService(IToDoRepository toDoRepository,
 
         Result<ToDoItem?> getResult = await _toDoRepository.GetByIdAsync(id, cancelToken);
 
-        ValidationResult validationResults = _validator.Validate(item);
-        CheckValidation(validationResults);
 
         Task<Result<ToDoItem>> matchResult = getResult.Match(
             existingToDo =>
@@ -65,6 +64,10 @@ public class ToDoService(IToDoRepository toDoRepository,
                     return Task.FromResult(Result<ToDoItem>.Failure(ToDoErrors.NotFound));
 
                 _updateMapper.UpdateModel(existingToDo, dto);
+
+                ValidationResult validationResults = _validator.Validate(existingToDo);
+                validationResults.CheckValidation();
+
                 return _toDoRepository.UpdateAsync(existingToDo, cancelToken);
             },
             error =>
@@ -82,16 +85,5 @@ public class ToDoService(IToDoRepository toDoRepository,
             return Task.FromCanceled<Result<ToDoItem>>(cancelToken);
 
         return _toDoRepository.DeleteAsync(id, cancelToken);
-    }
-
-    private static void CheckValidation(ValidationResult results)
-    {
-        if (results.IsValid == false)
-        {
-            foreach (ValidationFailure? failure in results.Errors)
-                Console.WriteLine($"Property {failure.PropertyName} failed validation. Error was: {failure.ErrorMessage}");
-
-            throw new FluentValidation.ValidationException(results.Errors);
-        }
     }
 }
