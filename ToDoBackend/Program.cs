@@ -15,6 +15,8 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+    Log.Information("Starting up the ToDoBackend service...");
+
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
     // Add services to the container.
