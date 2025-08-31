@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using ToDoBackend.Controllers;
-using ToDoBackend.Models;
+using ToDoBackend.Models.ToDoItem;
 using ToDoBackend.Repositories;
 using Xunit;
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToDoBackend.Dtos;
-using ToDoBackend.Models;
+using ToDoBackend.Models.ToDoItem;
 using ToDoBackend.Services;
 
 namespace ToDoBackend.Controllers;
