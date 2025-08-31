@@ -61,6 +61,7 @@ public class ToDoItem : IModel, IDisposable
                 Log.Error($"Invalid time zone ID: {timeZoneId}");
 
             ScheduleInfo.SetTimeZoneId(timeZoneId, preserveInstance);
+            isChanged = true;
         }
 
         if (isChanged)
