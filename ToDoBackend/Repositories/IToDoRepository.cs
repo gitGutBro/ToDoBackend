@@ -1,5 +1,5 @@
 ﻿using ToDoBackend.Dtos;
-using ToDoBackend.Models;
+using ToDoBackend.Models.ToDoItem;
 
 namespace ToDoBackend.Repositories;
 

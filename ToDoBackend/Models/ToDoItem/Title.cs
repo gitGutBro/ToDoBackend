@@ -1,4 +1,4 @@
-﻿namespace ToDoBackend.Models;
+﻿namespace ToDoBackend.Models.ToDoItem;
 
 public sealed record class Title
 {

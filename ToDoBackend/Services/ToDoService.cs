@@ -1,7 +1,7 @@
 ﻿using FluentValidation.Results;
 using ToDoBackend.Dtos;
 using ToDoBackend.Mappers;
-using ToDoBackend.Models;
+using ToDoBackend.Models.ToDoItem;
 using ToDoBackend.Repositories;
 using ToDoBackend.Validators;
 
