@@ -1,16 +1,13 @@
 ﻿using ToDoBackend.Dtos;
-using ToDoBackend.Models;
+using ToDoBackend.Models.ToDoItem;
 
 namespace ToDoBackend.Mappers;
 
 public class CreateToDoMapper : IMapper<ToDoItem, CreateToDoItemDto>
 {
-    public ToDoItem MapToModel(CreateToDoItemDto dto) => 
-        new(dto.Title!)
-        {
-            IsCompleted = dto.IsCompleted
-        };
+    public ToDoItem MapToModel(CreateToDoItemDto dto) =>
+        new(dto.Title!, dto.Description);
 
     public CreateToDoItemDto MapToDto(ToDoItem mappable) =>
-        new(mappable.Title, mappable.IsCompleted);
+        new(mappable.Title, mappable.Description);
 }
