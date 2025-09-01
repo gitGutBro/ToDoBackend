@@ -61,7 +61,7 @@ public class ToDoService(IToDoRepository toDoRepository,
             existingToDo =>
             {
                 if (existingToDo is null)
-                    return Task.FromResult(Result<ToDoItem>.Failure(ToDoErrors.NotFound));
+                    return Task.FromResult(Result<ToDoItem>.Failure(Error.NotFound));
 
                 _updateMapper.UpdateModel(existingToDo, dto);
 

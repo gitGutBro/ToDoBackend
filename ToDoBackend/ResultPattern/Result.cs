@@ -2,12 +2,12 @@
 
 public class Result<TValue>
 {
-    private readonly TValue? _value;
+    private readonly TValue _value;
     private readonly Error _error;
 
     private readonly bool _isSuccess;
 
-    private Result(TValue? value)
+    private Result(TValue value)
     {
         _isSuccess = true;
         _value = value;
@@ -17,7 +17,7 @@ public class Result<TValue>
     private Result(Error error)
     {
         _isSuccess = false;
-        _value = default;
+        _value = default!;
         _error = error;
     }
 

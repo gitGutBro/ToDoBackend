@@ -26,7 +26,7 @@ public class ToDoController(IToDoService toDoService) : ControllerBase
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancelToken)
     {
         if (id == Guid.Empty)
-            return BadRequest(ToDoErrors.MissingId.Description);
+            return BadRequest(Error.MissingId.Description);
 
         return await this.ExecuteAsync<ToDoItem?>(
             cancellationToken => _toDoService.GetByIdAsync(id, cancellationToken),
@@ -65,7 +65,7 @@ public class ToDoController(IToDoService toDoService) : ControllerBase
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancelToken)
     {
         if (id == Guid.Empty)
-            return BadRequest(ToDoErrors.MissingId.Description);
+            return BadRequest(Error.MissingId.Description);
 
         return await this.ExecuteAsync<ToDoItem>(
             cancellationToken => _toDoService.DeleteAsync(id, cancellationToken),

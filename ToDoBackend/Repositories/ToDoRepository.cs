@@ -52,7 +52,7 @@ public class ToDoRepository : IToDoRepository
         ToDoItem? item = _toDoItems.FirstOrDefault(item => item.Id == id);
 
         if (item is null)
-            return Task.FromResult(Result<ToDoItem>.Failure(ToDoErrors.NotFound));
+            return Task.FromResult(Result<ToDoItem>.Failure(Error.NotFound));
 
         _toDoItems.Remove(item);
         return Task.FromResult(Result<ToDoItem>.Success(item));
