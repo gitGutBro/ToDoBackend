@@ -19,43 +19,27 @@ public class ToDoService(IToDoRepository toDoRepository,
     private readonly CreateToDoMapper _createMapper = createMapper ?? throw new ArgumentNullException(nameof(createMapper));
     private readonly UpdateToDoMapper _updateMapper = updateMapper ?? throw new ArgumentNullException(nameof(updateMapper));
 
-    public Task<Result<IEnumerable<ToDoItem>>> GetAllAsync(CancellationToken cancelToken)
+    public async Task<Result<IEnumerable<ToDoItem>>> GetAllAsync(CancellationToken cancelToken) =>
+        await _toDoRepository.GetAllAsync(cancelToken);
+
+    public async Task<Result<ToDoItem?>> GetByIdAsync(Guid id, CancellationToken cancelToken) =>
+        await _toDoRepository.GetByIdAsync(id, cancelToken);
+
+    public async Task<Result<ToDoItem>> CreateAsync(CreateToDoItemDto dto, CancellationToken cancelToken)
     {
-        if (cancelToken.IsCancellationRequested)
-            return Task.FromCanceled<Result<IEnumerable<ToDoItem>>>(cancelToken);
-
-        return _toDoRepository.GetAllAsync(cancelToken);
-    }
-
-    public Task<Result<ToDoItem?>> GetByIdAsync(Guid id, CancellationToken cancelToken)
-    {
-        if (cancelToken.IsCancellationRequested)
-            return Task.FromCanceled<Result<ToDoItem?>>(cancelToken);
-
-        return _toDoRepository.GetByIdAsync(id, cancelToken);
-    }
-
-    public Task<Result<ToDoItem>> CreateAsync(CreateToDoItemDto dto, CancellationToken cancelToken)
-    {
-        if (cancelToken.IsCancellationRequested)
-            cancelToken.ThrowIfCancellationRequested();
-
         ToDoItem item = _createMapper.MapToModel(dto);
 
         ValidationResult validationResults = _validator.Validate(item);
-        validationResults.CheckValidation();
-        
-        return _toDoRepository.CreateAsync(item, cancelToken);
 
+        if (validationResults.TryCheckValidation() == false)
+            return await Task.FromResult(Result<ToDoItem>.Failure(Error.ValidationError));
+
+        return await _toDoRepository.CreateAsync(item, cancelToken);
     }
 
     public async Task<Result<ToDoItem>> UpdateAsync(Guid id, UpdateToDoItemDto dto, CancellationToken cancelToken)
     {
-        if (cancelToken.IsCancellationRequested)
-            cancelToken.ThrowIfCancellationRequested();
-
         Result<ToDoItem?> getResult = await _toDoRepository.GetByIdAsync(id, cancelToken);
-
 
         Task<Result<ToDoItem>> matchResult = getResult.Match(
             existingToDo =>
@@ -66,7 +50,9 @@ public class ToDoService(IToDoRepository toDoRepository,
                 _updateMapper.UpdateModel(existingToDo, dto);
 
                 ValidationResult validationResults = _validator.Validate(existingToDo);
-                validationResults.CheckValidation();
+                
+                if (validationResults.TryCheckValidation() == false)
+                    return Task.FromResult(Result<ToDoItem>.Failure(Error.ValidationError));
 
                 return _toDoRepository.UpdateAsync(existingToDo, cancelToken);
             },
@@ -79,11 +65,6 @@ public class ToDoService(IToDoRepository toDoRepository,
         return await matchResult;
     }
 
-    public Task<Result<ToDoItem>> DeleteAsync(Guid id, CancellationToken cancelToken)
-    {
-        if (cancelToken.IsCancellationRequested)
-            return Task.FromCanceled<Result<ToDoItem>>(cancelToken);
-
-        return _toDoRepository.DeleteAsync(id, cancelToken);
-    }
+    public async Task<Result<ToDoItem>> DeleteAsync(Guid id, CancellationToken cancelToken) =>
+        await _toDoRepository.DeleteAsync(id, cancelToken);
 }

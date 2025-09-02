@@ -25,5 +25,5 @@ public class Result<TValue>
     public static Result<TValue> Failure(Error error) => new(error);
 
     public TResult Match<TResult>(Func<TValue, TResult> success, Func<Error, TResult> failure) =>
-        _isSuccess ? success(_value!) : failure(_error);
+        _isSuccess ? success(_value) : failure(_error);
 }

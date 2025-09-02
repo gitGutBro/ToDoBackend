@@ -1,18 +1,21 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Serilog;
 
 namespace ToDoBackend.Extensions;
 
-public static class ValidationResultExtensions
-{
-    public static void CheckValidation(this ValidationResult validationResult)
+public static class ValidationResultExtensions 
+{ 
+    public static bool TryCheckValidation(this ValidationResult validationResult)
     {
-        if (validationResult.IsValid == false)
-        {
-            foreach (ValidationFailure? failure in validationResult.Errors)
-                Console.WriteLine($"Property {failure.PropertyName} failed validation. Error was: {failure.ErrorMessage}");
+        ArgumentNullException.ThrowIfNull(validationResult);
 
-            throw new ValidationException(validationResult.Errors);
-        }
+        if (validationResult.IsValid)
+            return true;
+
+        foreach (ValidationFailure failure in validationResult.Errors)
+            Log.Error($"Property {failure.PropertyName} failed validation. Error was: {failure.ErrorMessage}");
+
+        return false;
     }
 }

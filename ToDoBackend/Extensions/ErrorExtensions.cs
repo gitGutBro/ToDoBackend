@@ -12,28 +12,27 @@
 
             return error.Code switch
             {
-                var code when code == Error.MissingId.Code => new BadRequestObjectResult(error.Description),
-                var code when code == Error.NotFound.Code => new NotFoundObjectResult(error.Description),
-                var code when code == Error.ValidationError.Code => new BadRequestObjectResult(error.Description),
-                var code when code == Error.DatabaseError.Code => new ObjectResult(new ProblemDetails
+                ErrorCode.MissingId => new BadRequestObjectResult(error.Description),
+                ErrorCode.NotFound => new NotFoundObjectResult(error.Description),
+                ErrorCode.ValidationError => new BadRequestObjectResult(error.Description),
+                ErrorCode.DatabaseError => new ObjectResult(new ProblemDetails
                 {
                     Title = "Database Error",
                     Detail = error.Description,
                     Status = StatusCodes.Status500InternalServerError
                 })
                 {
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = StatusCodes.Status500InternalServerError 
                 },
-                var code when code == Error.UnknownError.Code => new ObjectResult(new ProblemDetails
+                ErrorCode.UnknownError => new ObjectResult(new ProblemDetails
                 {
                     Title = "Unknown Error",
                     Detail = error.Description,
                     Status = StatusCodes.Status500InternalServerError
                 })
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError
+                { 
+                    StatusCode = StatusCodes.Status500InternalServerError 
                 },
-
 
                 _ => new ObjectResult(new ProblemDetails
                 {
@@ -42,7 +41,7 @@
                     Status = StatusCodes.Status500InternalServerError
                 })
                 {
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = StatusCodes.Status500InternalServerError 
                 }
             };
         }
