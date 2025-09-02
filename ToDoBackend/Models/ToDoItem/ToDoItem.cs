@@ -1,5 +1,6 @@
 ﻿using NodaTime;
 using Serilog;
+using System.Text.Json.Serialization;
 
 namespace ToDoBackend.Models.ToDoItem;
 
@@ -20,7 +21,7 @@ public class ToDoItem : IModel, IDisposable
     public AuditInfo AuditInfo { get; } = new();
     public ScheduleInfo ScheduleInfo { get; } = new();
     public CompletionInfo CompletionInfo { get; } = new();
-    public uint? Xmin { get; private set; }
+    [JsonIgnore] public uint? Xmin { get; private set; }
 
     public void UpdateTitle(string newTitle)
     {
