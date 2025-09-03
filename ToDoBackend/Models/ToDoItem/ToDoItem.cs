@@ -7,7 +7,7 @@ public class ToDoItem : IModel, IDisposable
 {
     public ToDoItem(string title, string? description = null)
     {
-        Title = new Title(title.Trim());
+        Title = title.Trim();
         Description = description == null ? "" : description.Trim();
         Changed += AuditInfo.RecordUpdate;
     }
@@ -15,7 +15,7 @@ public class ToDoItem : IModel, IDisposable
     public event Action? Changed;
 
     public Guid Id { get; } = Guid.NewGuid();
-    public Title Title { get; }
+    public string Title { get; private set; }
     public string? Description { get; private set; }
     public AuditInfo AuditInfo { get; } = new();
     public ScheduleInfo ScheduleInfo { get; } = new();
@@ -24,7 +24,7 @@ public class ToDoItem : IModel, IDisposable
 
     public void UpdateTitle(string newTitle)
     {
-        Title.SetValue(newTitle);
+        Title = newTitle.Trim();
         Changed?.Invoke();
     }
 

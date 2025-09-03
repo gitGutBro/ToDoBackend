@@ -1,4 +1,4 @@
-﻿namespace ToDoBackend.Models.ToDoItem;
+﻿namespace ToDoBackend.Models;
 
 public interface IModel
 {

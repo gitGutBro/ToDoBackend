@@ -1,4 +1,4 @@
-﻿using ToDoBackend.Models.ToDoItem;
+﻿using ToDoBackend.Models;
 
 namespace ToDoBackend.Mappers;
 
