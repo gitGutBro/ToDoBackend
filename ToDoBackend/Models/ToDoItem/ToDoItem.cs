@@ -1,5 +1,4 @@
 ﻿using NodaTime;
-using Serilog;
 using System.Text.Json.Serialization;
 
 namespace ToDoBackend.Models.ToDoItem;
@@ -35,49 +34,46 @@ public class ToDoItem : IModel, IDisposable
         Changed?.Invoke();
     }
 
-    public void SetScheduledInfo(LocalDateTime? dueDateTime, bool preserveInstance, string? timeZoneId = null)
+    public void SetScheduledInfo(LocalDateTime? dueDateTime, bool preserveInstant, string? timeZoneId = null)
     {
         bool isChanged = false;
 
-        if (dueDateTime!.Value.Date != ScheduleInfo.DueDate)
+        if (string.IsNullOrWhiteSpace(timeZoneId) == false && timeZoneId != ScheduleInfo.TimeZoneId)
         {
-            ScheduleInfo.SetDueDate(dueDateTime!.Value.Date);
+            ScheduleInfo.SetTimeZoneId(timeZoneId, preserveInstant);
             isChanged = true;
         }
 
-        if (dueDateTime!.Value.TimeOfDay != ScheduleInfo.DueTime)
+        if (dueDateTime.HasValue)
         {
-            ScheduleInfo.SetDueTime(dueDateTime!.Value.TimeOfDay);
-            isChanged = true;
-        }
+            LocalDateTime localDateTime = dueDateTime.Value;
 
-        if (timeZoneId != null)
-        {
-            if (ScheduleInfo.TimeZoneId == timeZoneId)
-                return;
+            if (ScheduleInfo.DueDate != localDateTime.Date)
+            {
+                ScheduleInfo.SetDueDate(localDateTime.Date, preserveInstant);
+                isChanged = true;
+            }
 
-            DateTimeZone? newTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(timeZoneId);
-
-            if (newTimeZone == null)
-                Log.Error($"Invalid time zone ID: {timeZoneId}");
-
-            ScheduleInfo.SetTimeZoneId(timeZoneId, preserveInstance);
-            isChanged = true;
+            if (ScheduleInfo.DueTime != localDateTime.TimeOfDay)
+            {
+                ScheduleInfo.SetDueTime(localDateTime.TimeOfDay, preserveInstant);
+                isChanged = true;
+            }
         }
 
         if (isChanged)
             Changed?.Invoke();
     }
 
-    public void SetDueTime(LocalTime dueTime)
+    public void SetDueTime(LocalTime dueTime, bool preserveInstant = false)
     {
-        ScheduleInfo.SetDueTime(dueTime);
+        ScheduleInfo.SetDueTime(dueTime, preserveInstant);
         Changed?.Invoke();
     }
 
-    public void SetDueDate(LocalDate dueDate)
+    public void SetDueDate(LocalDate dueDate, bool preserveInstant = false)
     {
-        ScheduleInfo.SetDueDate(dueDate);
+        ScheduleInfo.SetDueDate(dueDate, preserveInstant);
         Changed?.Invoke();
     }
 

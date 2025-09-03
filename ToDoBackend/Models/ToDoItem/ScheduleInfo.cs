@@ -10,16 +10,20 @@ public record class ScheduleInfo
     public string? TimeZoneId { get; private set; }
     public Instant? ScheduledAt { get; private set; }
 
-    public void SetDueDate(LocalDate? dueDate)
+    public void SetDueDate(LocalDate? dueDate, bool preserveInstant = false)
     {
         DueDate = dueDate;
-        SetScheduledAt();
+
+        if (preserveInstant == false)
+            SetScheduledAt();
     }
 
-    public void SetDueTime(LocalTime? dueTime)
+    public void SetDueTime(LocalTime? dueTime, bool preserveInstant = false)
     {
         DueTime = dueTime;
-        SetScheduledAt();
+
+        if (preserveInstant == false)
+            SetScheduledAt();
     }
 
     public void SetTimeZoneId(string timeZoneId, bool preserveInstant = false)
@@ -33,21 +37,17 @@ public record class ScheduleInfo
         DateTimeZone? newTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(timeZoneId)
             ?? throw new ArgumentException($"Invalid time zone ID: {timeZoneId}", nameof(timeZoneId));
 
+        if (preserveInstant && ScheduledAt.HasValue)
+        {
+            ZonedDateTime zonedDateTime = ScheduledAt.Value.InZone(newTimeZone);
+            TimeZoneId = timeZoneId;
+            DueDate = zonedDateTime.Date;
+            DueTime = zonedDateTime.TimeOfDay;
+            return;
+        }
+
         TimeZoneId = timeZoneId;
-
-        if (preserveInstant)
-        {
-            if (ScheduledAt.HasValue == false)
-                return;
-
-            ZonedDateTime zoneDateTime = ScheduledAt.Value.InZone(newTimeZone);
-            DueDate = zoneDateTime.Date;
-            DueTime = zoneDateTime.TimeOfDay;
-        }
-        else
-        {
-            SetScheduledAt();
-        }
+        SetScheduledAt();
     }
 
     private void SetScheduledAt()
