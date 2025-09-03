@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToDoBackend.Dtos;
-using ToDoBackend.Models.ToDoItem;
 using ToDoBackend.Extensions;
 using ToDoBackend.Services;
 
