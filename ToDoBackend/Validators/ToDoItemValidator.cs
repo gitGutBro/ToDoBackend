@@ -20,9 +20,9 @@ public class ToDoItemValidator : AbstractValidator<ToDoItem>
             .WithMessage("Название задачи не может быть пустым!")
             .Must(title => string.IsNullOrWhiteSpace(title) == false)
             .WithMessage("Название не может состоять только из пробелов.")
-            .Must(title => title.Value.Length >= MinTitleLength)
+            .Must(title => title.Length >= MinTitleLength)
             .WithMessage($"Минимальное количество символов: {MinTitleLength}")
-            .Must(title => title.Value.Length <= MaxTitleLength)
+            .Must(title => title.Length <= MaxTitleLength)
             .WithMessage($"Максимальное количество символов: {MaxTitleLength}");
     }
 }

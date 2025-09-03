@@ -4,7 +4,7 @@ using ToDoBackend.Repositories;
 using ToDoBackend.Services;
 using ToDoBackend.Validators;
 
-const string LogFormat = "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} :: {Message:lj}{NewLine}{Exception}";
+const string LogFormat = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {SourceContext} :: {Message:lj}{NewLine}{Exception}";
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(outputTemplate: LogFormat)
