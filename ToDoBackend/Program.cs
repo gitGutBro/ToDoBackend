@@ -2,13 +2,25 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
+using Serilog;
 using ToDoBackend.Mappers;
-using ToDoBackend.Repositories;
 using ToDoBackend.Services;
 using ToDoBackend.Validators;
+using ToDoBackend.Repositories;
+
+const string LogFormat = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {SourceContext} :: {Message:lj}{NewLine}{Exception}";
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console(outputTemplate: LogFormat)
+    .WriteTo.File($"logs/logs-.txt", rollingInterval: RollingInterval.Day)
+    .Enrich.FromLogContext()
+    .MinimumLevel.Debug()
+    .CreateLogger();
 
 try
 {
+    Log.Information("Starting up the ToDoBackend service...");
+
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddControllers()
@@ -17,6 +29,8 @@ try
             options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         });
 
+    builder.Host.UseSerilog();
+    builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
 
     builder.Services.AddSwaggerGen(converter =>
@@ -53,7 +67,8 @@ try
 
     WebApplication app = builder.Build();
 
-    // Configure the HTTP request pipeline.
+    app.UseSerilogRequestLogging();
+
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
@@ -70,12 +85,12 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"An error occurred: {ex.Message}");
-    Environment.Exit(1);
+    Log.Fatal(ex, "Application start-up failed");
+    throw;
 }
 finally
 {
-    Console.WriteLine("Application has stopped.");
+    Log.CloseAndFlush();
 }
 
 public partial class Program;

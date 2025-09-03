@@ -1,4 +1,5 @@
-﻿using ToDoBackend.Models.ToDoItem;
+using ToDoBackend.Models.ToDoItem;
+using ToDoBackend.ResultPattern;
 
 namespace ToDoBackend.Repositories;
 
@@ -6,26 +7,34 @@ public class ToDoRepository : IToDoRepository
 {
     private readonly List<ToDoItem> _toDoItems = [];
 
-    public async Task<IEnumerable<ToDoItem>> GetAllAsync() =>
-        await Task.FromResult(_toDoItems);
+    public Task<Result<IEnumerable<ToDoItem>>> GetAllAsync(CancellationToken cancelToken) =>
+        Task.FromResult(Result<IEnumerable<ToDoItem>>.Success(_toDoItems));
 
-    public async Task<ToDoItem?> GetByIdAsync(Guid id) =>
-        await Task.FromResult(_toDoItems.FirstOrDefault(item => item.Id == id));
-
-    public Task CreateAsync(ToDoItem item)
+    public Task<Result<ToDoItem?>> GetByIdAsync(Guid id, CancellationToken cancelToken)
     {
-        _toDoItems.Add(item);
-        return Task.CompletedTask;
+        ToDoItem? result = _toDoItems.FirstOrDefault(item => item.Id == id);
+
+        return Task.FromResult(Result<ToDoItem?>.Success(result));
     }
 
-    public Task UpdateAsync(ToDoItem item) =>
-        Task.CompletedTask;
-
-    public async Task DeleteAsync(Guid id)
+    public Task<Result<ToDoItem>> CreateAsync(ToDoItem item, CancellationToken cancelToken)
     {
-        ToDoItem? itemToRemove = await GetByIdAsync(id);
+        _toDoItems.Add(item);
 
-        if (itemToRemove is not null)
-            _toDoItems.Remove(itemToRemove);
+        return Task.FromResult(Result<ToDoItem>.Success(item));
+    }
+
+    public Task<Result<ToDoItem>> UpdateAsync(ToDoItem item, CancellationToken cancelToken) =>
+        Task.FromResult(Result<ToDoItem>.Success(item));
+
+    public Task<Result<ToDoItem>> DeleteAsync(Guid id, CancellationToken cancelToken)
+    {
+        ToDoItem? item = _toDoItems.FirstOrDefault(item => item.Id == id);
+
+        if (item is null)
+            return Task.FromResult(Result<ToDoItem>.Failure(Error.NotFound));
+
+        _toDoItems.Remove(item);
+        return Task.FromResult(Result<ToDoItem>.Success(item));
     }
 }

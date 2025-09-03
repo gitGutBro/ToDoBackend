@@ -21,7 +21,7 @@ public class ToDoControllerTests
         string controllerName = nameof(ToDoController).Replace("Controller", "");
 
         //Act
-        await repository.CreateAsync(new ToDoItem(ValidTitle));
+        await repository.CreateAsync(new ToDoItem(ValidTitle), new CancellationToken());
         HttpResponseMessage responce = await client.GetAsync($"api/{controllerName}");
 
         //Assert
