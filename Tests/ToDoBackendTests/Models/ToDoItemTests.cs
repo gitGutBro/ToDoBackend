@@ -19,7 +19,7 @@ public class ToDoItemTests
     }
 
     [Fact]
-    public void UpdateTitle_ShouldChangeTitleValue_WhenNewTitleIsValid()
+    public void UpdateTitle_ShouldChangeTitle_WhenNewTitleIsValid()
     {
         //Arrange
         const string ValidTitle = "Title";
@@ -31,6 +31,6 @@ public class ToDoItemTests
         item.UpdateTitle(NewValidTitleToUpdate);
 
         //Assert
-        Assert.Equal(NewValidTitleToUpdate, item.Title.Value);
+        Assert.Equal(NewValidTitleToUpdate, item.Title);
     }
 }
