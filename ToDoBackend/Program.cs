@@ -6,9 +6,9 @@ using NodaTime.Serialization.SystemTextJson;
 using Serilog;
 using ToDoBackend.Data;
 using ToDoBackend.Mappers;
-using ToDoBackend.Repositories;
 using ToDoBackend.Services;
 using ToDoBackend.Validators;
+using ToDoBackend.Repositories;
 
 const string LogFormat = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {SourceContext} :: {Message:lj}{NewLine}{Exception}";
 
@@ -29,28 +29,32 @@ try
 
     builder.Services.AddControllers()
         .AddJsonOptions(options =>
-            options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb));
+        {
+            options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        });
 
+    builder.Host.UseSerilog();
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen(options =>
-    {
-        options.SwaggerDoc("v1", new OpenApiInfo { Title = "ToDo API", Version = "v1" });
 
-        options.MapType<Instant>(() => new OpenApiSchema
+    builder.Services.AddSwaggerGen(converter =>
+    {
+        converter.SwaggerDoc("v1", new OpenApiInfo { Title = "ToDo API", Version = "v1" });
+
+        converter.MapType<Instant>(() => new OpenApiSchema
         {
             Type = "string",
             Format = "date-time",
             Example = new OpenApiString(Instant.FromUtc(2025, 8, 31, 12, 34, 56).ToString())
         });
 
-        options.MapType<LocalDate>(() => new OpenApiSchema
+        converter.MapType<LocalDate>(() => new OpenApiSchema
         {
             Type = "string",
             Format = "date",
             Example = new OpenApiString("2025-08-31")
         });
 
-        options.MapType<LocalTime>(() => new OpenApiSchema
+        converter.MapType<LocalTime>(() => new OpenApiSchema
         {
             Type = "string",
             Format = "time",
