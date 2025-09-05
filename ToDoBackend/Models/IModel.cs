@@ -1,3 +1,6 @@
 ﻿namespace ToDoBackend.Models;
 
-public interface IModel;
+public interface IModel
+{
+    AuditInfo AuditInfo { get; }
+}

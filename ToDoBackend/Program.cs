@@ -1,8 +1,12 @@
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 using Serilog;
 using ToDoBackend.Mappers;
-using ToDoBackend.Repositories;
 using ToDoBackend.Services;
 using ToDoBackend.Validators;
+using ToDoBackend.Repositories;
 
 const string LogFormat = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {SourceContext} :: {Message:lj}{NewLine}{Exception}";
 
@@ -19,13 +23,41 @@ try
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-    // Add services to the container.
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        });
 
     builder.Host.UseSerilog();
     builder.Services.AddControllers();
-    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+
+    builder.Services.AddSwaggerGen(converter =>
+    {
+        converter.SwaggerDoc("v1", new OpenApiInfo { Title = "ToDo API", Version = "v1" });
+
+        converter.MapType<Instant>(() => new OpenApiSchema
+        {
+            Type = "string",
+            Format = "date-time",
+            Example = new OpenApiString(Instant.FromUtc(2025, 8, 31, 12, 34, 56).ToString())
+        });
+
+        converter.MapType<LocalDate>(() => new OpenApiSchema
+        {
+            Type = "string",
+            Format = "date",
+            Example = new OpenApiString("2025-08-31")
+        });
+
+        converter.MapType<LocalTime>(() => new OpenApiSchema
+        {
+            Type = "string",
+            Format = "time",
+            Example = new OpenApiString("09:00:00")
+        });
+    });
 
     builder.Services.AddSingleton<IToDoRepository, ToDoRepository>();
     builder.Services.AddSingleton<IToDoService, ToDoService>();
@@ -37,7 +69,6 @@ try
 
     app.UseSerilogRequestLogging();
 
-    // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();

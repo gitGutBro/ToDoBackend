@@ -1,3 +1,5 @@
-﻿namespace ToDoBackend.Dtos;
+﻿using NodaTime;
 
-public record class UpdateToDoItemDto(string Title, bool IsCompleted);
+namespace ToDoBackend.Dtos;
+
+public record class UpdateToDoItemDto(string Title, string Description, bool IsCompleted, LocalDate? LocalDate, LocalTime? LocalTime, string? TimeZoneId, bool PreserveScheduleAtInstance);
