@@ -6,9 +6,10 @@ using NodaTime.Serialization.SystemTextJson;
 using Serilog;
 using ToDoBackend.Data;
 using ToDoBackend.Mappers;
+using ToDoBackend.Models.ToDoItem;
+using ToDoBackend.Repositories;
 using ToDoBackend.Services;
 using ToDoBackend.Validators;
-using ToDoBackend.Repositories;
 
 const string LogFormat = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {SourceContext} :: {Message:lj}{NewLine}{Exception}";
 
@@ -65,7 +66,7 @@ try
     string connectionString = builder.Configuration.GetConnectionString("Postgres")
         ?? throw new InvalidOperationException("Connection string 'Postgres' not found.");
 
-    builder.Services.AddDbContext<TodoDbContext>(options =>
+    builder.Services.AddDbContext<ToDoItemDbContext>(options =>
         options
             .UseNpgsql(connectionString, npgsql => npgsql.UseNodaTime())
             .UseSnakeCaseNamingConvention());
@@ -73,13 +74,46 @@ try
     builder.Services.AddHealthChecks()
         .AddNpgSql(connectionString, name: "postgres", tags: ["db", "postgres"]);
 
-    builder.Services.AddSingleton<IToDoRepository, ToDoRepositoryEf>();
-    builder.Services.AddSingleton<IToDoService, ToDoService>();
+    builder.Services.AddScoped<IToDoRepository, ToDoRepositoryEf>();
+    builder.Services.AddScoped<IToDoService, ToDoService>();
     builder.Services.AddSingleton<ToDoItemValidator>();
     builder.Services.AddSingleton<CreateToDoMapper>();
     builder.Services.AddSingleton<UpdateToDoMapper>();
 
     WebApplication app = builder.Build();
+
+    using (IServiceScope scope = app.Services.CreateScope())
+    {
+        IServiceProvider services = scope.ServiceProvider;
+
+        try
+        {
+            ToDoItemDbContext dbContext = services.GetRequiredService<ToDoItemDbContext>();
+            dbContext.Database.Migrate();
+
+            if (app.Environment.IsDevelopment())
+            {
+                using IServiceScope seedScope = app.Services.CreateScope();
+                IServiceProvider seedServices = seedScope.ServiceProvider;
+                ToDoItemDbContext database = seedServices.GetRequiredService<ToDoItemDbContext>();
+
+                if (await database.ToDoItems.AnyAsync() == false)
+                {
+                    database.ToDoItems.Add(new ToDoItem("Seed task 1", "Created by seed"));
+                    database.ToDoItems.Add(new ToDoItem("Seed task 2", "Created by seed"));
+                    await database.SaveChangesAsync();
+                    Log.Information("Seeded database with initial ToDo items.");
+                }
+            }
+
+            Log.Information("Database migration completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "An error occurred during database migration");
+            throw;
+        }
+    }
 
     app.UseSerilogRequestLogging();
 
