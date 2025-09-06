@@ -25,13 +25,23 @@ public class ToDoItem : IModel, IDisposable
 
     public void UpdateTitle(string newTitle)
     {
-        Title = newTitle.Trim();
+        string trimmed = newTitle.Trim();
+
+        if (Title == trimmed)
+            return;
+
+        Title = trimmed;
         Changed?.Invoke();
     }
 
     public void UpdateDescription(string? newDescription)
     {
-        Description = newDescription?.Trim() ?? "";
+        string trimmed = newDescription?.Trim() ?? "";
+
+        if (trimmed == Description)
+            return;
+
+        Description = trimmed;
         Changed?.Invoke();
     }
 
@@ -40,26 +50,17 @@ public class ToDoItem : IModel, IDisposable
         bool isChanged = false;
 
         if (string.IsNullOrWhiteSpace(timeZoneId) == false && timeZoneId != ScheduleInfo.TimeZoneId)
-        {
-            ScheduleInfo.SetTimeZoneId(timeZoneId, preserveInstant);
-            isChanged = true;
-        }
+            isChanged = isChanged == false && ScheduleInfo.TrySetTimeZoneId(timeZoneId, preserveInstant);
 
         if (dueDateTime.HasValue)
         {
             LocalDateTime localDateTime = dueDateTime.Value;
 
             if (ScheduleInfo.DueDate != localDateTime.Date)
-            {
-                ScheduleInfo.SetDueDate(localDateTime.Date, preserveInstant);
-                isChanged = true;
-            }
+                isChanged = isChanged == false && ScheduleInfo.TrySetDueDate(localDateTime.Date, preserveInstant);
 
             if (ScheduleInfo.DueTime != localDateTime.TimeOfDay)
-            {
-                ScheduleInfo.SetDueTime(localDateTime.TimeOfDay, preserveInstant);
-                isChanged = true;
-            }
+                isChanged = isChanged == false && ScheduleInfo.TrySetDueTime(localDateTime.TimeOfDay, preserveInstant);
         }
 
         if (isChanged)
@@ -68,32 +69,32 @@ public class ToDoItem : IModel, IDisposable
 
     public void SetDueTime(LocalTime dueTime, bool preserveInstant = false)
     {
-        ScheduleInfo.SetDueTime(dueTime, preserveInstant);
-        Changed?.Invoke();
+        if (ScheduleInfo.TrySetDueTime(dueTime, preserveInstant))
+            Changed?.Invoke();
     }
 
     public void SetDueDate(LocalDate dueDate, bool preserveInstant = false)
     {
-        ScheduleInfo.SetDueDate(dueDate, preserveInstant);
-        Changed?.Invoke();
+        if (ScheduleInfo.TrySetDueDate(dueDate, preserveInstant))
+            Changed?.Invoke();
     }
 
     public void SetTimeZone(string timeZoneId, bool preserveInstant = false)
     {
-        ScheduleInfo.SetTimeZoneId(timeZoneId, preserveInstant);
-        Changed?.Invoke();
+        if (ScheduleInfo.TrySetTimeZoneId(timeZoneId, preserveInstant))
+            Changed?.Invoke();
     }
 
     public void MarkAsCompleted()
     {
-        CompletionInfo.MarkAsCompleted();
-        Changed?.Invoke();
+        if (CompletionInfo.TryMarkAsCompleted())
+            Changed?.Invoke();
     }
 
     public void MarkAsUncompleted()
     {
-        CompletionInfo.MarkAsUncompleted();
-        Changed?.Invoke();
+        if (CompletionInfo.TryMarkAsUncompleted())
+            Changed?.Invoke();
     }
 
     public void Dispose()
