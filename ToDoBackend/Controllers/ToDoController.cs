@@ -11,7 +11,7 @@ public class ToDoController(IToDoService toDoService) : ControllerBase
 {
     private readonly IToDoService _toDoService = toDoService ?? throw new ArgumentNullException(nameof(toDoService));
 
-    [HttpGet]
+    [HttpGet("all")]
     public async Task<IActionResult> GetAll(CancellationToken cancelToken)
     {
         return await this.ExecuteAsync

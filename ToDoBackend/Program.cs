@@ -1,18 +1,21 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
+using ToDoBackend.Data;
 using ToDoBackend.Mappers;
+using ToDoBackend.Models.ToDoItem;
+using ToDoBackend.Repositories;
 using ToDoBackend.Services;
 using ToDoBackend.Validators;
-using ToDoBackend.Repositories;
 
 const string LogFormat = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {SourceContext} :: {Message:lj}{NewLine}{Exception}";
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(outputTemplate: LogFormat)
-    .WriteTo.File($"logs/logs-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("logs/logs-.txt", rollingInterval: RollingInterval.Day)
     .Enrich.FromLogContext()
     .MinimumLevel.Debug()
     .CreateLogger();
@@ -23,6 +26,8 @@ try
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+    builder.Host.UseSerilog();
+
     builder.Services.AddControllers()
         .AddJsonOptions(options =>
         {
@@ -30,7 +35,6 @@ try
         });
 
     builder.Host.UseSerilog();
-    builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
 
     builder.Services.AddSwaggerGen(converter =>
@@ -59,13 +63,57 @@ try
         });
     });
 
-    builder.Services.AddSingleton<IToDoRepository, ToDoRepository>();
-    builder.Services.AddSingleton<IToDoService, ToDoService>();
-    builder.Services.AddSingleton<ToDoItemValidator>();
-    builder.Services.AddSingleton<CreateToDoMapper>();
-    builder.Services.AddSingleton<UpdateToDoMapper>();
+    string connectionString = builder.Configuration.GetConnectionString("Postgres")
+        ?? throw new InvalidOperationException("Connection string 'Postgres' not found.");
+
+    builder.Services.AddDbContext<ToDoItemDbContext>(options =>
+        options
+            .UseNpgsql(connectionString, npgsql => npgsql.UseNodaTime())
+            .UseSnakeCaseNamingConvention());
+
+    builder.Services.AddHealthChecks()
+        .AddNpgSql(connectionString, name: "postgres", tags: ["db", "postgres"]);
+
+    builder.Services.AddScoped<IToDoRepository, ToDoRepositoryEf>();
+    builder.Services.AddScoped<IToDoService, ToDoService>();
+    builder.Services.AddTransient<ToDoItemValidator>();
+    builder.Services.AddTransient<CreateToDoMapper>();
+    builder.Services.AddTransient<UpdateToDoMapper>();
 
     WebApplication app = builder.Build();
+
+    using (IServiceScope scope = app.Services.CreateScope())
+    {
+        IServiceProvider services = scope.ServiceProvider;
+
+        try
+        {
+            ToDoItemDbContext dbContext = services.GetRequiredService<ToDoItemDbContext>();
+            dbContext.Database.Migrate();
+
+            if (app.Environment.IsDevelopment())
+            {
+                using IServiceScope seedScope = app.Services.CreateScope();
+                IServiceProvider seedServices = seedScope.ServiceProvider;
+                ToDoItemDbContext database = seedServices.GetRequiredService<ToDoItemDbContext>();
+
+                if (await database.ToDoItems.AnyAsync() == false)
+                {
+                    database.ToDoItems.Add(new ToDoItem("Seed task 1", "Created by seed"));
+                    database.ToDoItems.Add(new ToDoItem("Seed task 2", "Created by seed"));
+                    await database.SaveChangesAsync();
+                    Log.Information("Seeded database with initial ToDo items.");
+                }
+            }
+
+            Log.Information("Database migration completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "An error occurred during database migration");
+            throw;
+        }
+    }
 
     app.UseSerilogRequestLogging();
 
@@ -75,10 +123,11 @@ try
         app.UseSwaggerUI();
     }
 
+    app.UseHttpsRedirection();
     app.UseRouting();
     app.UseAuthorization();
-    app.UseHttpsRedirection();
 
+    app.MapHealthChecks("/health");
     app.MapControllers();
 
     app.Run();

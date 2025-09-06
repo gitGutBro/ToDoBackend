@@ -6,6 +6,8 @@ public enum ErrorCode
     MissingId,
     NotFound,
     ValidationError,
+    OperationCanceled,
     DatabaseError,
-    UnknownError
+    DatabaseConcurrencyError,
+    UnknownError,
 }

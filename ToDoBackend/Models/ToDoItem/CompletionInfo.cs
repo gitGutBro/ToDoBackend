@@ -1,4 +1,5 @@
 ﻿using NodaTime;
+using Serilog;
 
 namespace ToDoBackend.Models.ToDoItem;
 
@@ -8,10 +9,13 @@ public record class CompletionInfo
     public Instant? FirstCompletedAt { get; private set; }
     public Instant? LastCompletedAt { get; private set; }
 
-    public void MarkAsCompleted()
+    public bool TryMarkAsCompleted()
     {
         if (IsCompleted)
-            return;
+        {
+            Log.Warning("Значение не изменилось.");
+            return false;
+        }
 
         Instant now = SystemClock.Instance.GetCurrentInstant();
 
@@ -20,8 +24,18 @@ public record class CompletionInfo
 
         LastCompletedAt = now;
         IsCompleted = true;
+        return true;
     }
 
-    public void MarkAsUncompleted() => 
+    public bool TryMarkAsUncompleted()
+    {
+        if (IsCompleted == false)
+        {
+            Log.Warning("Значение не изменилось.");
+            return false;
+        }
+
         IsCompleted = false;
+        return true;
+    }
 }
