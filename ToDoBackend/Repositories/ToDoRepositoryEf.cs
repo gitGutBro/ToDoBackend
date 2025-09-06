@@ -1,13 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Serilog;
 using ToDoBackend.Data;
-using ToDoBackend.Models;
+using ToDoBackend.Models.ToDoItem;
+using ToDoBackend.ResultPattern;
 
 namespace ToDoBackend.Repositories;
 
-public class ToDoRepositoryEf(TodoDbContext context) : IToDoRepository
+public class ToDoRepositoryEf(ToDoItemDbContext context) : IToDoRepository
 {
-    private readonly TodoDbContext _context = context;
+    private readonly ToDoItemDbContext _context = context;
 
     public async Task<Result<ToDoItem>> CreateAsync(ToDoItem item, CancellationToken cancelToken)
     {
@@ -16,60 +18,138 @@ public class ToDoRepositoryEf(TodoDbContext context) : IToDoRepository
         try
         {
             await _context.SaveChangesAsync(cancelToken);
-            return Result.Ok(item);
+            return Result<ToDoItem>.Success(item);
+        }
+        catch (OperationCanceledException) when (cancelToken.IsCancellationRequested)
+        {
+            Log.Warning("Операция создания задачи была отменена.");
+            return Result<ToDoItem>.Failure(Error.OperatinCanceled);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pex && pex.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            Log.Warning(pex, "Уникальное ограничение нарушено при создании задачи (title). Constraint: {Constraint}", pex.ConstraintName);
+            return Result<ToDoItem>.Failure(Error.DuplicateTitle);
         }
         catch (DbUpdateException ex)
         {
             Log.Error(ex, "Ошибка при создании задачи.");
-            return Result.Fail(Error.DatabaseError("Ошибка при создании задачи."));
+            return Result<ToDoItem>.Failure(Error.DatabaseError);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Неожиданная ошибка при создании задачи.");
+            return Result<ToDoItem>.Failure(Error.UnknownError);
         }
     }
 
-    public Task<List<ToDoItem>> GetAllAsync(CancellationToken cancelToken) =>
-        _context.ToDoItems.AsNoTracking().OrderBy(item => item.Id).ToListAsync(cancelToken);
-
-    public async Task<Result<ToDoItem>> GetByIdAsync(Guid id, CancellationToken cancelToken)
+    public async Task<Result<IEnumerable<ToDoItem>>> GetAllAsync(CancellationToken cancellationToken)
     {
-        ToDoItem? entity = await _context.ToDoItems.AsNoTracking().FirstOrDefaultAsync(item => item.Id == id, cancelToken);
-        return entity is null ? Result.Fail(Error.NotFound(id)) : Result.Ok(entity);
+        try
+        {
+            List<ToDoItem> items = await _context.ToDoItems
+                .AsNoTracking()
+                .OrderBy(item => item.Id)
+                .ToListAsync(cancellationToken);
+
+            return Result<IEnumerable<ToDoItem>>.Success(items);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            Log.Warning("Операция получения всех задач была отменена.");
+            return Result<IEnumerable<ToDoItem>>.Failure(Error.OperatinCanceled);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Ошибка при получении всех задач.");
+            return Result<IEnumerable<ToDoItem>>.Failure(Error.UnknownError);
+        }
     }
 
-    public async Task<Result> UpdateAsync(ToDoItem item, CancellationToken cancelToken)
+    public async Task<Result<ToDoItem?>> GetByIdAsync(Guid id, CancellationToken cancelToken)
+    {
+        try
+        {
+            ToDoItem? gotItem = await _context.ToDoItems
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item => item.Id == id, cancelToken);
+
+            return gotItem is null
+                ? Result<ToDoItem?>.Failure(Error.NotFoundWithId(id))
+                : Result<ToDoItem?>.Success(gotItem);
+        }
+        catch (OperationCanceledException) when (cancelToken.IsCancellationRequested)
+        {
+            Log.Warning("Операция получения задачи по Id была отменена.");
+            return Result<ToDoItem?>.Failure(Error.OperatinCanceled);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Ошибка при получении задачи по Id {Id}.", id);
+            return Result<ToDoItem?>.Failure(Error.UnknownError);
+        }
+    }
+
+    public async Task<Result<ToDoItem>> UpdateAsync(ToDoItem item, CancellationToken cancelToken)
     {
         try
         {
             _context.ToDoItems.Update(item);
             int affected = await _context.SaveChangesAsync(cancelToken);
-            return affected == 0 ? Result.Fail(ToDoErrors.NotFound(item.Id)) : Result.Ok();
+
+            return affected == 0
+                ? Result<ToDoItem>.Failure(Error.NotFoundWithId(item.Id))
+                : Result<ToDoItem>.Success(item);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (OperationCanceledException) when (cancelToken.IsCancellationRequested)
         {
-            return Result.Fail(ToDoErrors.ConcurrencyConflict(item.Id));
+            Log.Warning("Операция обновления задачи была отменена.");
+            return Result<ToDoItem>.Failure(Error.OperatinCanceled);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            Log.Error(ex, "Ошибка конкуретности базы данных при обновлении задачи с Id {Id}.", item.Id);
+            return Result<ToDoItem>.Failure(Error.DatabaseConcurrencyErrorWithId(item.Id));
         }
         catch (DbUpdateException ex)
         {
-            Log.Error(ex, "Ошибка при создании задачи.");
-            return Result.Fail(Error.DatabaseError("Ошибка при создании задачи."));
+            Log.Error(ex, "Ошибка при обновлении задачи.");
+            return Result<ToDoItem>.Failure(Error.DatabaseError);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Неожиданная ошибка при обновлении задачи.");
+            return Result<ToDoItem>.Failure(Error.UnknownError);
         }
     }
 
-    public async Task<Result> DeleteAsync(Guid id, CancellationToken cancelToken)
+    public async Task<Result<ToDoItem>> DeleteAsync(Guid id, CancellationToken cancelToken)
     {
-        ToDoItem? entity = await _context.ToDoItems.FirstOrDefaultAsync(item => item.Id == id, cancelToken);
+        ToDoItem? itemToDelete = await _context.ToDoItems.FirstOrDefaultAsync(item => item.Id == id, cancelToken);
 
-        if (entity is null) 
-            return Result.Fail(ToDoErrors.NotFound(id));
+        if (itemToDelete is null) 
+            return Result<ToDoItem>.Failure(Error.NotFoundWithId(id));
 
-        _context.ToDoItems.Remove(entity);
+        _context.ToDoItems.Remove(itemToDelete);
 
         try
         {
             await _context.SaveChangesAsync(cancelToken);
-            return Result.Ok();
+            return Result<ToDoItem>.Success(itemToDelete);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (OperationCanceledException) when (cancelToken.IsCancellationRequested)
         {
-            return Result.Fail(ToDoErrors.ConcurrencyConflict(id));
+            Log.Warning($"Операция удаления задачи была отменена.");
+            return Result<ToDoItem>.Failure(Error.OperatinCanceled);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            Log.Error($"Ошибка конкуретности базы данных при удалении задачи с Id: {itemToDelete.Id}. Ошибка: {ex}");
+            return Result<ToDoItem>.Failure(Error.DatabaseConcurrencyErrorWithId(itemToDelete.Id));
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Ошибка при удалении задачи: {ex}");
+            return Result<ToDoItem>.Failure(Error.UnknownError);
         }
     }
 }
