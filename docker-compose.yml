@@ -1,7 +1,7 @@
 services:
   postgres:
-    image: postgres:latest
-    container_name: ToDoItems
+    image: postgres:15
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pass
@@ -11,8 +11,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U todo_user"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U todo -d todo_db"]
+      interval: 10s
       timeout: 5s
       retries: 5
 
