@@ -76,9 +76,9 @@ try
 
     builder.Services.AddScoped<IToDoRepository, ToDoRepositoryEf>();
     builder.Services.AddScoped<IToDoService, ToDoService>();
-    builder.Services.AddSingleton<ToDoItemValidator>();
-    builder.Services.AddSingleton<CreateToDoMapper>();
-    builder.Services.AddSingleton<UpdateToDoMapper>();
+    builder.Services.AddTransient<ToDoItemValidator>();
+    builder.Services.AddTransient<CreateToDoMapper>();
+    builder.Services.AddTransient<UpdateToDoMapper>();
 
     WebApplication app = builder.Build();
 
