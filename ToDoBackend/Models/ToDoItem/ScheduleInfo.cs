@@ -1,5 +1,6 @@
 ﻿using NodaTime;
 using NodaTime.TimeZones;
+using Serilog;
 
 namespace ToDoBackend.Models.ToDoItem;
 
@@ -10,29 +11,48 @@ public record class ScheduleInfo
     public string? TimeZoneId { get; private set; }
     public Instant? ScheduledAt { get; private set; }
 
-    public void SetDueDate(LocalDate? dueDate, bool preserveInstant = false)
+    public bool TrySetDueDate(LocalDate? dueDate, bool preserveInstant = false)
     {
+        if (DueDate == dueDate)
+        {
+            Log.Warning("Значение не изменилось.");
+            return false;
+        }
+
         DueDate = dueDate;
 
         if (preserveInstant == false)
             SetScheduledAt();
+
+        return true;
     }
 
-    public void SetDueTime(LocalTime? dueTime, bool preserveInstant = false)
+    public bool TrySetDueTime(LocalTime? dueTime, bool preserveInstant = false)
     {
+        if (DueTime == dueTime)
+        {
+            Log.Warning("Значение не изменилось.");
+            return false;
+        }
+
         DueTime = dueTime;
 
         if (preserveInstant == false)
             SetScheduledAt();
+
+        return true;
     }
 
-    public void SetTimeZoneId(string timeZoneId, bool preserveInstant = false)
+    public bool TrySetTimeZoneId(string timeZoneId, bool preserveInstant = false)
     {
         if (string.IsNullOrWhiteSpace(timeZoneId))
             throw new ArgumentNullException(nameof(timeZoneId), "TimeZoneId cannot be null or empty.");
 
         if (timeZoneId == TimeZoneId)
-            return;
+        {
+            Log.Warning("Значение не изменилось.");
+            return false;
+        }    
 
         DateTimeZone? newTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(timeZoneId)
             ?? throw new ArgumentException($"Invalid time zone ID: {timeZoneId}", nameof(timeZoneId));
@@ -43,11 +63,12 @@ public record class ScheduleInfo
             TimeZoneId = timeZoneId;
             DueDate = zonedDateTime.Date;
             DueTime = zonedDateTime.TimeOfDay;
-            return;
+            return true;
         }
 
         TimeZoneId = timeZoneId;
         SetScheduledAt();
+        return true;
     }
 
     private void SetScheduledAt()
