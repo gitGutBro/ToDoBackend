@@ -5,6 +5,8 @@ namespace ToDoBackend.Models.ToDoItem;
 
 public class ToDoItem : IModel, IDisposable
 {
+    [JsonIgnore] private uint? _xmin;
+
     public ToDoItem(string title, string? description = null)
     {
         Title = title.Trim();
@@ -20,7 +22,6 @@ public class ToDoItem : IModel, IDisposable
     public AuditInfo AuditInfo { get; } = new();
     public ScheduleInfo ScheduleInfo { get; } = new();
     public CompletionInfo CompletionInfo { get; } = new();
-    [JsonIgnore] public uint? Xmin { get; private set; }
 
     public void UpdateTitle(string newTitle)
     {
@@ -100,4 +101,7 @@ public class ToDoItem : IModel, IDisposable
         GC.SuppressFinalize(this);
         Changed -= AuditInfo.RecordUpdate;
     }
+
+    internal uint? GetXminForDiagnostics() => 
+        _xmin;
 }
