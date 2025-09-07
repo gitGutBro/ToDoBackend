@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Shared.ResultPattern;
 
 namespace Shared.Extensions;
@@ -8,7 +8,8 @@ public static class BaseControllerExtensions
     /// <summary>
     /// Выполнить асинхронное действие (возвращающее Result{T}), обработать отмену и маппинг ошибок.
     /// </summary>
-    public static async Task<IActionResult> ExecuteAsync<TResult>(
+    public static async Task<IActionResult> ExecuteAsync<TResult>
+    (
         this ControllerBase controller,
         Func<CancellationToken, Task<Result<TResult>>> action,
         Func<TResult, IActionResult> onSuccess,
@@ -38,7 +39,8 @@ public static class BaseControllerExtensions
     /// Перегрузка ExecuteAsync для действий, когда нас интересует только факт успеха (не значение).
     /// onSuccess вызывается при успешном результате и должен вернуть соответствующий IActionResult (например NoContent()).
     /// </summary>
-    public static async Task<IActionResult> ExecuteAsyncNoResult<TValue>(
+    public static async Task<IActionResult> ExecuteAsyncNoResult<TValue>
+    (
         this ControllerBase controller,
         Func<CancellationToken, Task<Result<TValue>>> action,
         Func<IActionResult> onSuccess,

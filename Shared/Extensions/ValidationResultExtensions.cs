@@ -1,10 +1,10 @@
-﻿using FluentValidation.Results;
+using FluentValidation.Results;
 using Serilog;
 
 namespace Shared.Extensions;
 
-public static class ValidationResultExtensions 
-{ 
+public static class ValidationResultExtensions
+{
     public static bool TryCheckValidation(this ValidationResult validationResult)
     {
         ArgumentNullException.ThrowIfNull(validationResult);
