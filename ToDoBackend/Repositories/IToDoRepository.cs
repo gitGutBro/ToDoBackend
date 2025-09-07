@@ -1,5 +1,5 @@
-using ToDoBackend.Models.ToDoItem;
-using ToDoBackend.ResultPattern;
+using Shared.ResultPattern;
+using ToDoBackend.Entities.ToDoItem;
 
 namespace ToDoBackend.Repositories;
 

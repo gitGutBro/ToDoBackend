@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shared.Extensions;
 using ToDoBackend.Dtos;
-using ToDoBackend.Extensions;
 using ToDoBackend.Services;
 
 namespace ToDoBackend.Controllers;

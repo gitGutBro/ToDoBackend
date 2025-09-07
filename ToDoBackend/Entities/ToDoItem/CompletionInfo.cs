@@ -1,7 +1,7 @@
 ﻿using NodaTime;
 using Serilog;
 
-namespace ToDoBackend.Models.ToDoItem;
+namespace ToDoBackend.Entities.ToDoItem;
 
 internal record class CompletionInfo
 {

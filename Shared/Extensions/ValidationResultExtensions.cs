@@ -1,8 +1,7 @@
-﻿using FluentValidation;
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 using Serilog;
 
-namespace ToDoBackend.Extensions;
+namespace Shared.Extensions;
 
 public static class ValidationResultExtensions 
 { 

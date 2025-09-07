@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using ToDoBackend.Models.ToDoItem;
+using ToDoBackend.Entities.ToDoItem;
 
 namespace ToDoBackend.Validators;
 

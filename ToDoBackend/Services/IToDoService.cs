@@ -1,5 +1,5 @@
-﻿using ToDoBackend.Dtos;
-using ToDoBackend.ResultPattern;
+﻿using Shared.ResultPattern;
+using ToDoBackend.Dtos;
 
 namespace ToDoBackend.Services;
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ToDoBackend.Data.Configurations;
-using ToDoBackend.Models.ToDoItem;
+using ToDoBackend.Entities.ToDoItem;
 
 namespace ToDoBackend.Data;
 

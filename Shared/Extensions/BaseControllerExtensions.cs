@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ToDoBackend.ResultPattern;
+using Shared.ResultPattern;
 
-namespace ToDoBackend.Extensions;
+namespace Shared.Extensions;
 
 public static class BaseControllerExtensions
 {

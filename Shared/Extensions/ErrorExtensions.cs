@@ -1,7 +1,8 @@
-﻿    using Microsoft.AspNetCore.Mvc;
-    using ToDoBackend.ResultPattern;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Shared.ResultPattern;
 
-    namespace ToDoBackend.Extensions;
+namespace Shared.Extensions;
 
     public static class ErrorExtensions
     {

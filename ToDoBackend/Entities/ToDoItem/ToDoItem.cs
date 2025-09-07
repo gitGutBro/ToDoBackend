@@ -1,9 +1,10 @@
 ﻿using NodaTime;
+using Shared.Entities;
 using System.Text.Json.Serialization;
 
-namespace ToDoBackend.Models.ToDoItem;
+namespace ToDoBackend.Entities.ToDoItem;
 
-internal class ToDoItem : IModel, IDisposable
+internal class ToDoItem : IEntity, IDisposable
 {
     [JsonIgnore] private uint? _xmin;
 

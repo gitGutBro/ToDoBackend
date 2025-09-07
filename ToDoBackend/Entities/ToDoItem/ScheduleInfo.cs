@@ -1,7 +1,7 @@
 ﻿using NodaTime;
 using NodaTime.TimeZones;
 
-namespace ToDoBackend.Models.ToDoItem;
+namespace ToDoBackend.Entities.ToDoItem;
 
 internal record class ScheduleInfo
 {

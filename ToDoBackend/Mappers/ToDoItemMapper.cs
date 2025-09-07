@@ -1,5 +1,6 @@
-﻿using ToDoBackend.Dtos;
-using ToDoBackend.Models.ToDoItem;
+﻿using Shared.Mappers;
+using ToDoBackend.Dtos;
+using ToDoBackend.Entities.ToDoItem;
 
 namespace ToDoBackend.Mappers;
 

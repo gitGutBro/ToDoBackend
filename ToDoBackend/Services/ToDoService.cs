@@ -1,11 +1,11 @@
 ﻿using FluentValidation.Results;
 using ToDoBackend.Dtos;
-using ToDoBackend.Mappers;
-using ToDoBackend.Models.ToDoItem;
 using ToDoBackend.Validators;
 using ToDoBackend.Repositories;
-using ToDoBackend.ResultPattern;
-using ToDoBackend.Extensions;
+using ToDoBackend.Entities.ToDoItem;
+using Shared.Mappers;
+using Shared.Extensions;
+using Shared.ResultPattern;
 
 namespace ToDoBackend.Services;
 

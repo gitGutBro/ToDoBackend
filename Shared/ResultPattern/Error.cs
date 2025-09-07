@@ -1,4 +1,4 @@
-﻿namespace ToDoBackend.ResultPattern;
+﻿namespace Shared.ResultPattern;
 
 public record class Error(ErrorCode Code, string Description)
 {

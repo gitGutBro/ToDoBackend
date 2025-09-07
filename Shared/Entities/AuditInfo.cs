@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace ToDoBackend.Models;
+namespace Shared.Entities;
 
 public record class AuditInfo
 {

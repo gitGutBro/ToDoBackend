@@ -1,4 +1,4 @@
-﻿namespace ToDoBackend.ResultPattern;
+﻿namespace Shared.ResultPattern;
 
 public class Result<TValue>
 {

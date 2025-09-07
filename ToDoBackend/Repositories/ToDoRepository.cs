@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Shared.ResultPattern;
 using ToDoBackend.Data;
-using ToDoBackend.Models.ToDoItem;
-using ToDoBackend.ResultPattern;
+using ToDoBackend.Entities.ToDoItem;
 
 namespace ToDoBackend.Repositories;
 
