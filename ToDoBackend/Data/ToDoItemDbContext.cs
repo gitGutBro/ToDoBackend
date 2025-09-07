@@ -1,11 +1,11 @@
-﻿    using Microsoft.EntityFrameworkCore;
-    using ToDoBackend.Models.ToDoItem;
+﻿using Microsoft.EntityFrameworkCore;
+using ToDoBackend.Models.ToDoItem;
 
-    namespace ToDoBackend.Data;
+namespace ToDoBackend.Data;
 
-    public class ToDoItemDbContext(DbContextOptions<ToDoItemDbContext> options) : DbContext(options)
-    {
-        public DbSet<ToDoItem> ToDoItems => Set<ToDoItem>();
+public class ToDoItemDbContext(DbContextOptions<ToDoItemDbContext> options) : DbContext(options)
+{
+    public DbSet<ToDoItem> ToDoItems => Set<ToDoItem>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
