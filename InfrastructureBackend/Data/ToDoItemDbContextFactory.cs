@@ -9,7 +9,8 @@ namespace InfrastructureBackend.Data
         {
             DbContextOptionsBuilder<ToDoItemDbContext> optionsBuilder = new();
 
-            optionsBuilder.UseNpgsql(
+            optionsBuilder.UseNpgsql
+            (
                 "Host=localhost;Port=5433;Database=ToDoItems;Username=postgres;Password=pass",
                 npgsqlOptions => npgsqlOptions.UseNodaTime()
             )
