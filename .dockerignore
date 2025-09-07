@@ -1,0 +1,67 @@
+# -------------------------
+# Build artefacts (exclude heavy output)
+# -------------------------
+bin/
+obj/
+**/bin/
+**/obj/
+
+# -------------------------
+# IDE and editor settings
+# -------------------------
+.vscode/
+.vs/
+.idea/
+*.suo
+*.user
+*.userprefs
+
+# -------------------------
+# Version control & local metadata
+# -------------------------
+.git
+.gitignore
+.gitattributes
+
+# -------------------------
+# Local env secrets, docker-compose overrides, local certificates
+# -------------------------
+.env
+.env.*.local
+docker-compose.override.yml
+docker-compose.*.local.yml
+secrets/
+certs/
+
+# -------------------------
+# Logs, temporary files
+# -------------------------
+logs/
+*.log
+tmp/
+temp/
+
+# -------------------------
+# OS / tooling files
+# -------------------------
+Thumbs.db
+.DS_Store
+
+# -------------------------
+# Node / frontend deps (if any)
+# -------------------------
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# -------------------------
+# Optional: exclude test output or local data dirs
+# -------------------------
+test-results/
+coverage/
+
+# -------------------------
+# Note:
+# - Don't exclude files that the Dockerfile needs to COPY.
+# - If a file is required by your Dockerfile, remove the corresponding ignore rule.
+# -------------------------
