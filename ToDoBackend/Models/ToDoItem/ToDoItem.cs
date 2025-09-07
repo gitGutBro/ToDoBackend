@@ -1,10 +1,9 @@
 ﻿using NodaTime;
-using Serilog;
 using System.Text.Json.Serialization;
 
 namespace ToDoBackend.Models.ToDoItem;
 
-public class ToDoItem : IModel, IDisposable
+internal class ToDoItem : IModel, IDisposable
 {
     [JsonIgnore] private uint? _xmin;
 
@@ -50,9 +49,7 @@ public class ToDoItem : IModel, IDisposable
     {
         bool isChanged = false;
 
-        if (string.IsNullOrWhiteSpace(timeZoneId))
-            Log.Error("Таймзона пустая или null!");
-        else
+        if (string.IsNullOrWhiteSpace(timeZoneId) == false)
             isChanged |= ScheduleInfo.TrySetTimeZoneId(timeZoneId, preserveInstant);
 
         if (dueDateTime.HasValue)

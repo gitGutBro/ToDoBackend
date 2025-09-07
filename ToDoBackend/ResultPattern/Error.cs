@@ -10,7 +10,6 @@ public record class Error(ErrorCode Code, string Description)
     public static Error DatabaseError => new(ErrorCode.DatabaseError, "Ошибка датабазы.");
     public static Error DatabaseConcurrencyError => new(ErrorCode.DatabaseConcurrencyError, "Ошибка датабазы.");
     public static Error UnknownError => new(ErrorCode.UnknownError, "Неизвестная ошибка.");
-    public static Error DuplicateTitle => new(ErrorCode.ValidationError, "Задача с таким заголовком уже существует.");
 
     public static Error NotFoundWithId(Guid id) =>
         new(ErrorCode.NotFound, $"Сущность с идентификатором '{id}' не найдена.");

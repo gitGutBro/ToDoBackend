@@ -1,10 +1,9 @@
 ﻿using NodaTime;
 using NodaTime.TimeZones;
-using Serilog;
 
 namespace ToDoBackend.Models.ToDoItem;
 
-public record class ScheduleInfo
+internal record class ScheduleInfo
 {
     public LocalDate? DueDate { get; private set; }
     public LocalTime? DueTime { get; private set; }
@@ -14,10 +13,7 @@ public record class ScheduleInfo
     public bool TrySetDueDate(LocalDate? dueDate, bool preserveInstant = false)
     {
         if (DueDate == dueDate)
-        {
-            Log.Warning("Значение не изменилось.");
             return false;
-        }
 
         DueDate = dueDate;
 
@@ -30,10 +26,7 @@ public record class ScheduleInfo
     public bool TrySetDueTime(LocalTime? dueTime, bool preserveInstant = false)
     {
         if (DueTime == dueTime)
-        {
-            Log.Warning("Значение не изменилось.");
             return false;
-        }
 
         DueTime = dueTime;
 
@@ -49,10 +42,7 @@ public record class ScheduleInfo
             throw new ArgumentNullException(nameof(timeZoneId), "TimeZoneId cannot be null or empty.");
 
         if (timeZoneId == TimeZoneId)
-        {
-            Log.Warning("Значение не изменилось.");
             return false;
-        }    
 
         DateTimeZone? newTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(timeZoneId)
             ?? throw new ArgumentException($"Invalid time zone ID: {timeZoneId}", nameof(timeZoneId));

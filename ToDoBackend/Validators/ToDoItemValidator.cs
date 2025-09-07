@@ -3,7 +3,7 @@ using ToDoBackend.Models.ToDoItem;
 
 namespace ToDoBackend.Validators;
 
-public class ToDoItemValidator : AbstractValidator<ToDoItem>
+internal class ToDoItemValidator : AbstractValidator<ToDoItem>
 {
     public ToDoItemValidator()
     {

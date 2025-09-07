@@ -3,7 +3,7 @@ using ToDoBackend.Models.ToDoItem;
 
 namespace ToDoBackend.Mappers;
 
-public class CreateToDoMapper : IMapper<ToDoItem, CreateToDoItemDto>
+internal class CreateToDoMapper : IMapper<ToDoItem, CreateToDoItemDto>
 {
     public ToDoItem MapToModel(CreateToDoItemDto dto) =>
         new(dto.Title!, dto.Description);

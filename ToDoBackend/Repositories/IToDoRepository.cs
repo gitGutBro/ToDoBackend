@@ -3,7 +3,7 @@ using ToDoBackend.ResultPattern;
 
 namespace ToDoBackend.Repositories;
 
-public interface IToDoRepository
+internal interface IToDoRepository
 {
     Task<Result<IEnumerable<ToDoItem>>> GetAllAsync(CancellationToken cancelToken);
     Task<Result<ToDoItem?>> GetByIdAsync(Guid id, CancellationToken cancelToken);

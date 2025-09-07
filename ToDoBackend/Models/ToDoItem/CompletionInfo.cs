@@ -3,7 +3,7 @@ using Serilog;
 
 namespace ToDoBackend.Models.ToDoItem;
 
-public record class CompletionInfo
+internal record class CompletionInfo
 {
     public bool IsCompleted { get; private set; }
     public Instant? FirstCompletedAt { get; private set; }

@@ -8,24 +8,22 @@ public static class BaseControllerExtensions
     /// <summary>
     /// Выполнить асинхронное действие (возвращающее Result{T}), обработать отмену и маппинг ошибок.
     /// </summary>
-    public static async Task<IActionResult> ExecuteAsync<TValue>(
+    public static async Task<IActionResult> ExecuteAsync<TResult>(
         this ControllerBase controller,
-        Func<CancellationToken, Task<Result<TValue>>> action,
-        Func<TValue, IActionResult> onSuccess,
-        CancellationToken cancelToken)
+        Func<CancellationToken, Task<Result<TResult>>> action,
+        Func<TResult, IActionResult> onSuccess,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(controller);
         ArgumentNullException.ThrowIfNull(action);
         ArgumentNullException.ThrowIfNull(onSuccess);
 
-        if (cancelToken.IsCancellationRequested)
-            return controller.StatusCode(499, "Request was cancelled.");
-
         try
         {
-            Result<TValue> result = await action(cancelToken);
+            Result<TResult> result = await action(cancellationToken);
 
-            return result.Match(
+            return result.Match
+            (
                 value => onSuccess(value),
                 error => error.ToActionResult()
             );
@@ -40,9 +38,9 @@ public static class BaseControllerExtensions
     /// Перегрузка ExecuteAsync для действий, когда нас интересует только факт успеха (не значение).
     /// onSuccess вызывается при успешном результате и должен вернуть соответствующий IActionResult (например NoContent()).
     /// </summary>
-    public static async Task<IActionResult> ExecuteAsync<T>(
+    public static async Task<IActionResult> ExecuteAsyncNoResult<TValue>(
         this ControllerBase controller,
-        Func<CancellationToken, Task<Result<T>>> action,
+        Func<CancellationToken, Task<Result<TValue>>> action,
         Func<IActionResult> onSuccess,
         CancellationToken cancellationToken)
     {
@@ -50,15 +48,13 @@ public static class BaseControllerExtensions
         ArgumentNullException.ThrowIfNull(action);
         ArgumentNullException.ThrowIfNull(onSuccess);
 
-        if (cancellationToken.IsCancellationRequested)
-            return controller.StatusCode(499, "Request was cancelled.");
-
         try
         {
-            Result<T> result = await action(cancellationToken);
+            Result<TValue> result = await action(cancellationToken);
 
-            return result.Match(
-                value => onSuccess(),
+            return result.Match
+            (
+                _ => onSuccess(),
                 error => error.ToActionResult()
             );
         }

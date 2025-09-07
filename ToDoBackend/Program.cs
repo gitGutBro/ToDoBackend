@@ -5,6 +5,7 @@ using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Serilog;
 using ToDoBackend.Data;
+using ToDoBackend.Dtos;
 using ToDoBackend.Mappers;
 using ToDoBackend.Models.ToDoItem;
 using ToDoBackend.Repositories;
@@ -74,11 +75,12 @@ try
     builder.Services.AddHealthChecks()
         .AddNpgSql(connectionString, name: "postgres", tags: ["db", "postgres"]);
 
-    builder.Services.AddScoped<IToDoRepository, ToDoRepositoryEf>();
+    builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
     builder.Services.AddScoped<IToDoService, ToDoService>();
     builder.Services.AddTransient<ToDoItemValidator>();
-    builder.Services.AddTransient<CreateToDoMapper>();
-    builder.Services.AddTransient<UpdateToDoMapper>();
+    builder.Services.AddTransient<IMapper<ToDoItem, CreateToDoItemDto>, CreateToDoMapper>();
+    builder.Services.AddTransient<IMapper<ToDoItem, ToDoItemDto>, ToDoItemMapper>();
+    builder.Services.AddTransient<IUpdateMapper<ToDoItem, UpdateToDoItemDto>, UpdateToDoMapper>();
 
     WebApplication app = builder.Build();
 

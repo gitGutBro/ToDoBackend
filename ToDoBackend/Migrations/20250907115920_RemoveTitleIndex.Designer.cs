@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using ToDoBackend.Data;
 namespace ToDoBackend.Migrations
 {
     [DbContext(typeof(ToDoItemDbContext))]
-    partial class ToDoItemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250907115920_RemoveTitleIndex")]
+    partial class RemoveTitleIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
