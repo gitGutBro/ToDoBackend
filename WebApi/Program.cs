@@ -4,6 +4,8 @@ using ApplicationBackend.Repositories;
 using ApplicationBackend.Services;
 using ApplicationBackend.Validators;
 using Domain.Entities.ToDoItem;
+using Domain.Factories;
+using Domain.Services;
 using InfrastructureBackend.Data;
 using InfrastructureBackend.Repositories;
 using InfrastructureBackend.Services;
@@ -79,6 +81,10 @@ try
 
     builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
     builder.Services.AddScoped<IToDoService, ToDoService>();
+    builder.Services.AddScoped<IToDoItemFactory, ToDoItemFactory>();
+    builder.Services.AddScoped<IScheduleService, ScheduleService>();
+    builder.Services.AddScoped<ICompletionService, CompletionService>();
+    builder.Services.AddScoped<IToDoItemFactory, ToDoItemFactory>();
     builder.Services.AddTransient<ToDoItemValidator>();
     builder.Services.AddTransient<IMapper<ToDoItem, CreateToDoItemDto>, CreateToDoMapper>();
     builder.Services.AddTransient<IMapper<ToDoItem, ToDoItemDto>, ToDoItemMapper>();

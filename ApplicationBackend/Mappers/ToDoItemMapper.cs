@@ -1,22 +1,31 @@
 ﻿using ApplicationBackend.Dtos;
 using Domain.Entities.ToDoItem;
+using Domain.Factories;
+using Shared.ResultPattern;
 
 namespace ApplicationBackend.Mappers;
 
-public class ToDoItemMapper : IMapper<ToDoItem, ToDoItemDto>
+public class ToDoItemMapper(IToDoItemFactory toDoItemFactory) : IMapper<ToDoItem, ToDoItemDto>
 {
-    public ToDoItem MapToModel(ToDoItemDto dto)
+    private readonly IToDoItemFactory _toDoItemFactory = toDoItemFactory;
+
+    public Result<ToDoItem> MapToModel(ToDoItemDto dto)
     {
-        ToDoItem item = new(dto.Title!, dto.Description);
+        ToDoItem item = _toDoItemFactory.Create(dto.Title!, dto.Description);
 
-        if (dto.IsCompleted)
-            item.MarkAsCompleted();
-        else
-            item.MarkAsUncompleted();
+        Result<bool> resultCompletion = dto.IsCompleted
+            ? item.MarkAsCompleted()
+            : item.MarkAsUncompleted();
 
-        item.SetScheduledInfo(dto.DueDate + dto.DueTime, preserveInstant: false, dto.TimeZoneId);
+        if (resultCompletion.IsFailure)
+            return Result<ToDoItem>.Failure(resultCompletion.Error);
 
-        return item;
+        Result<bool> resultSchedule = item.SetScheduledInfo(dto.DueDate + dto.DueTime, dto.PreserveInstant, dto.TimeZoneId);
+
+        if (resultSchedule.IsFailure)
+            return Result<ToDoItem>.Failure(resultSchedule.Error);
+
+        return Result<ToDoItem>.Success(item);
     }
 
     public ToDoItemDto MapToDto(ToDoItem mappable) =>

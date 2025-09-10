@@ -11,10 +11,10 @@ using ApplicationBackend.Services;
 namespace InfrastructureBackend.Services;
 
 public class ToDoService(IToDoRepository toDoRepository,
-                           ToDoItemValidator validator,
-                           IMapper<ToDoItem, CreateToDoItemDto> createMapper,
-                           IUpdateMapper<ToDoItem, UpdateToDoItemDto> updateMapper,
-                           IMapper<ToDoItem, ToDoItemDto> toDoMapper) : IToDoService
+                         ToDoItemValidator validator,
+                         IMapper<ToDoItem, CreateToDoItemDto> createMapper,
+                         IUpdateMapper<ToDoItem, UpdateToDoItemDto> updateMapper,
+                         IMapper<ToDoItem, ToDoItemDto> toDoMapper) : IToDoService
 {
     private readonly IToDoRepository _toDoRepository = toDoRepository ?? throw new ArgumentNullException(nameof(toDoRepository));
     private readonly ToDoItemValidator _validator = validator ?? throw new ArgumentNullException(nameof(validator));
@@ -48,14 +48,14 @@ public class ToDoService(IToDoRepository toDoRepository,
 
     public async Task<Result<ToDoItemDto>> CreateAsync(CreateToDoItemDto dto, CancellationToken cancellationToken)
     {
-        ToDoItem item = _createMapper.MapToModel(dto);
+        Result<ToDoItem> item = _createMapper.MapToModel(dto);
 
-        ValidationResult validationResults = _validator.Validate(item);
+        ValidationResult validationResults = _validator.Validate(item.Value);
 
         if (validationResults.TryCheckValidation() == false)
             return await Task.FromResult(Result<ToDoItemDto>.Failure(Error.ValidationError));
 
-        Result<ToDoItem> created = await _toDoRepository.CreateAsync(item, cancellationToken);
+        Result<ToDoItem> created = await _toDoRepository.CreateAsync(item.Value, cancellationToken);
 
         return created.Match
         (
@@ -80,18 +80,21 @@ public class ToDoService(IToDoRepository toDoRepository,
         if (branch.Item is null)
             return Result<ToDoItemDto>.Failure(Error.NotFoundWithId(id));
 
-        _updateMapper.UpdateModel(branch.Item, dto);
+        Result<bool> updateResult = _updateMapper.UpdateEntity(branch.Item, dto);
+
+        if (updateResult.IsFailure)
+            return Result<ToDoItemDto>.Failure(updateResult.Error);
 
         ValidationResult validation = _validator.Validate(branch.Item);
 
         if (validation.TryCheckValidation() == false)
             return Result<ToDoItemDto>.Failure(Error.ValidationError);
 
-        Result<ToDoItem> updateResult = await _toDoRepository.UpdateAsync(branch.Item, cancellationToken);
+        Result<ToDoItem> updatedItemResult = await _toDoRepository.UpdateAsync(branch.Item, cancellationToken);
 
         return updateResult.Match
         (
-            updated => Result<ToDoItemDto>.Success(_toDoMapper.MapToDto(updated)),
+            _ => Result<ToDoItemDto>.Success(_toDoMapper.MapToDto(updatedItemResult.Value)),
             Result<ToDoItemDto>.Failure
         );
     }

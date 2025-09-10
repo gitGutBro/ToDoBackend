@@ -24,6 +24,31 @@ public class Result<TValue>
     public static Result<TValue> Success(TValue value) => new(value);
     public static Result<TValue> Failure(Error error) => new(error);
 
+    public bool IsSuccess => _isSuccess;
+    public bool IsFailure => _isSuccess == false;
+
+    public TValue Value
+    {
+        get
+        {
+            if (IsSuccess == false)
+                throw new InvalidOperationException($"Result contains error: {_error}");
+
+            return _value;
+        }
+    }
+
+    public Error Error
+    {
+        get
+        {
+            if (IsFailure == false)
+                throw new InvalidOperationException("Result does not contain an error.");
+
+            return _error;
+        }
+    }
+
     public TResult Match<TResult>(Func<TValue, TResult> success, Func<Error, TResult> failure) =>
         _isSuccess ? success(_value) : failure(_error);
 }

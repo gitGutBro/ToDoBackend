@@ -1,5 +1,6 @@
 ﻿using ApplicationBackend.Repositories;
 using Domain.Entities.ToDoItem;
+using Domain.Services;
 using InfrastructureBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -7,12 +8,16 @@ using Shared.ResultPattern;
 
 namespace InfrastructureBackend.Repositories;
 
-public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
+public class ToDoRepository(ToDoItemDbContext context, IScheduleService scheduleService, ICompletionService completionService) : IToDoRepository
 {
     private readonly ToDoItemDbContext _context = context;
+    private readonly IScheduleService _scheduleService = scheduleService;
+    private readonly ICompletionService _completionService = completionService;
 
     public async Task<Result<ToDoItem>> CreateAsync(ToDoItem item, CancellationToken cancellationToken)
     {
+        item.AttachServices(_scheduleService, _completionService);
+
         _context.ToDoItems.Add(item);
 
         try
@@ -46,6 +51,9 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
                 .OrderBy(item => item.Id)
                 .ToListAsync(cancellationToken);
 
+            foreach (var it in items)
+                it.AttachServices(_scheduleService, _completionService);
+
             return Result<IEnumerable<ToDoItem>>.Success(items);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -68,9 +76,12 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
                 .AsNoTracking()
                 .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
-            return gotItem is null
-                ? Result<ToDoItem?>.Failure(Error.NotFoundWithId(id))
-                : Result<ToDoItem?>.Success(gotItem);
+            if (gotItem is null)
+                return Result<ToDoItem?>.Failure(Error.NotFoundWithId(id));
+
+            gotItem.AttachServices(_scheduleService, _completionService);
+
+            return Result<ToDoItem?>.Success(gotItem);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -88,6 +99,8 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
     {
         try
         {
+            item.AttachServices(_scheduleService, _completionService);
+
             _context.ToDoItems.Update(item);
             int affected = await _context.SaveChangesAsync(cancellationToken);
 
@@ -123,6 +136,8 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
 
         if (itemToDelete is null) 
             return Result<ToDoItem>.Failure(Error.NotFoundWithId(id));
+
+        itemToDelete.AttachServices(_scheduleService, _completionService);
 
         _context.ToDoItems.Remove(itemToDelete);
 
