@@ -1,7 +1,7 @@
 ﻿using Domain.Entities.ToDoItem;
 using FluentValidation;
 
-namespace ApplicationBackend.Validators;
+namespace Domain.Validators;
 
 public class ToDoItemValidator : AbstractValidator<ToDoItem>
 {

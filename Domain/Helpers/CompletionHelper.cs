@@ -2,11 +2,11 @@ using NodaTime;
 using Domain.Entities.ToDoItem;
 using Shared.ResultPattern;
 
-namespace Domain.Services;
+namespace Domain.Helpers;
 
-public class CompletionService : ICompletionService
+internal static class CompletionHelper
 {
-    public Result<bool> TryMarkAsCompleted(CompletionInfo completionInfo)
+    public static Result<bool> TryMarkAsCompleted(CompletionInfo completionInfo)
     {
         if (completionInfo.IsCompleted)
             return Result<bool>.Success(false);
@@ -21,7 +21,7 @@ public class CompletionService : ICompletionService
         return Result<bool>.Success(true);
     }
 
-    public Result<bool> TryMarkAsUncompleted(CompletionInfo completionInfo)
+    public static Result<bool> TryMarkAsUncompleted(CompletionInfo completionInfo)
     {
         if (completionInfo.IsCompleted == false)
             return Result<bool>.Success(false);

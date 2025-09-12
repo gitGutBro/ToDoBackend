@@ -4,23 +4,23 @@ using Domain.Entities.ToDoItem;
 using Domain.Specifications.Schedule;
 using Shared.ResultPattern;
 
-namespace Domain.Services;
+namespace Domain.Helpers;
 
-public class ScheduleService : IScheduleService
+internal static class ScheduleHelper
 {
     private static readonly TimeZoneIdSpecification _timeZoneIdSpecification = new();
 
-    public Result<bool> TrySetDueDate(ScheduleInfo scheduleInfo, LocalDate? dueDate, bool preserveInstant = false) => 
+    public static Result<bool> TrySetDueDate(ScheduleInfo scheduleInfo, LocalDate? dueDate, bool preserveInstant = false) => 
         TrySetValue(scheduleInfo, dueDate, scheduleInfo.DueDate,
                     value => scheduleInfo.DueDate = value,
                     preserveInstant);
 
-    public Result<bool> TrySetDueTime(ScheduleInfo scheduleInfo, LocalTime? dueTime, bool preserveInstant = false) => 
+    public static Result<bool> TrySetDueTime(ScheduleInfo scheduleInfo, LocalTime? dueTime, bool preserveInstant = false) => 
         TrySetValue(scheduleInfo, dueTime, scheduleInfo.DueTime,
                     value => scheduleInfo.DueTime = value,
                     preserveInstant);
 
-    public Result<bool> TrySetTimeZoneId(ScheduleInfo scheduleInfo, string timeZoneId, bool preserveInstant = false)
+    public static Result<bool> TrySetTimeZoneId(ScheduleInfo scheduleInfo, string timeZoneId, bool preserveInstant = false)
     {
         if (timeZoneId == scheduleInfo.TimeZoneId)
             return Result<bool>.Success(false);
@@ -42,7 +42,7 @@ public class ScheduleService : IScheduleService
         return Result<bool>.Success(true);
     }
 
-    public Result<bool> TrySetScheduledInfo(ScheduleInfo scheduleInfo, LocalDateTime? dueDateTime, bool preserveInstant, string? timeZoneId = null)
+    public static Result<bool> TrySetScheduledInfo(ScheduleInfo scheduleInfo, LocalDateTime? dueDateTime, bool preserveInstant, string? timeZoneId = null)
     {
         bool hasChanges = false;
 

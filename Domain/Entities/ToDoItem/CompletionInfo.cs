@@ -4,7 +4,7 @@ namespace Domain.Entities.ToDoItem;
 
 public record class CompletionInfo
 {
-    public bool IsCompleted { get; set; }
-    public Instant? FirstCompletedAt { get; set; }
-    public Instant? LastCompletedAt { get; set; }
+    public bool IsCompleted { get; internal set; }
+    public Instant? FirstCompletedAt { get; internal set; }
+    public Instant? LastCompletedAt { get; internal set; }
 }

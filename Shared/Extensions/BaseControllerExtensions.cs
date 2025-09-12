@@ -19,20 +19,13 @@ public static class BaseControllerExtensions
         ArgumentNullException.ThrowIfNull(action);
         ArgumentNullException.ThrowIfNull(onSuccess);
 
-        try
-        {
-            Result<TResult> result = await action(cancellationToken);
+        Result<TResult> result = await action(cancellationToken);
 
-            return result.Match
-            (
-                value => onSuccess(value),
-                error => error.ToActionResult()
-            );
-        }
-        catch (OperationCanceledException)
-        {
-            return controller.StatusCode(499, "Request was cancelled.");
-        }
+        return result.Match
+        (
+            value => onSuccess(value),
+            error => error.ToActionResult()
+        );
     }
 
     /// <summary>
@@ -50,19 +43,12 @@ public static class BaseControllerExtensions
         ArgumentNullException.ThrowIfNull(action);
         ArgumentNullException.ThrowIfNull(onSuccess);
 
-        try
-        {
-            Result<TValue> result = await action(cancellationToken);
+        Result<TValue> result = await action(cancellationToken);
 
-            return result.Match
-            (
-                _ => onSuccess(),
-                error => error.ToActionResult()
-            );
-        }
-        catch (OperationCanceledException)
-        {
-            return controller.StatusCode(499, "Request was cancelled.");
-        }
+        return result.Match
+        (
+            _ => onSuccess(),
+            error => error.ToActionResult()
+        );
     }
 }

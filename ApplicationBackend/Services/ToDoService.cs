@@ -3,12 +3,11 @@ using Shared.ResultPattern;
 using Shared.Extensions;
 using Domain.Entities.ToDoItem;
 using ApplicationBackend.Repositories;
-using ApplicationBackend.Validators;
 using ApplicationBackend.Mappers;
 using ApplicationBackend.Dtos;
-using ApplicationBackend.Services;
+using Domain.Validators;
 
-namespace InfrastructureBackend.Services;
+namespace ApplicationBackend.Services;
 
 public class ToDoService(IToDoRepository toDoRepository,
                          ToDoItemValidator validator,
