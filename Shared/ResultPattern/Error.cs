@@ -4,9 +4,11 @@ public record class Error(ErrorCode Code, string Description)
 {
     public static Error None => new(ErrorCode.None, string.Empty);
     public static Error MissingId => new(ErrorCode.MissingId, "Идентификатор не может быть пустым.");
+    public static Error NullReference => new(ErrorCode.NullReference, "Сущность имеет значение null.");
     public static Error NotFound => new(ErrorCode.NotFound, "Сущность не найдена.");
     public static Error ValidationError => new(ErrorCode.ValidationError, "Ошибка валидации.");
-    public static Error OperatinCanceled => new(ErrorCode.OperationCanceled, "Операция была отменена.");
+    public static Error PublishError => new(ErrorCode.PublishError, "Ошибка передачи сообщения в брокер сообщений.");
+    public static Error OperationCanceled => new(ErrorCode.OperationCanceled, "Операция была отменена.");
     public static Error DatabaseError => new(ErrorCode.DatabaseError, "Ошибка датабазы.");
     public static Error DatabaseConcurrencyError => new(ErrorCode.DatabaseConcurrencyError, "Ошибка датабазы.");
     public static Error UnknownError => new(ErrorCode.UnknownError, "Неизвестная ошибка.");
