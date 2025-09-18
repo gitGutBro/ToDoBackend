@@ -23,7 +23,7 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             Log.Warning("Операция создания задачи была отменена.");
-            return Result<ToDoItem>.Failure(Error.OperatinCanceled);
+            return Result<ToDoItem>.Failure(Error.OperationCanceled);
         }
         catch (DbUpdateException ex)
         {
@@ -51,7 +51,7 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             Log.Warning("Операция получения всех задач была отменена.");
-            return Result<IEnumerable<ToDoItem>>.Failure(Error.OperatinCanceled);
+            return Result<IEnumerable<ToDoItem>>.Failure(Error.OperationCanceled);
         }
         catch (Exception ex)
         {
@@ -76,7 +76,7 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             Log.Warning("Операция получения задачи по Id была отменена.");
-            return Result<ToDoItem?>.Failure(Error.OperatinCanceled);
+            return Result<ToDoItem?>.Failure(Error.OperationCanceled);
         }
         catch (Exception ex)
         {
@@ -99,7 +99,7 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             Log.Warning("Операция обновления задачи была отменена.");
-            return Result<ToDoItem>.Failure(Error.OperatinCanceled);
+            return Result<ToDoItem>.Failure(Error.OperationCanceled);
         }
         catch (DbUpdateConcurrencyException ex)
         {
@@ -135,7 +135,7 @@ public class ToDoRepository(ToDoItemDbContext context) : IToDoRepository
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             Log.Warning($"Операция удаления задачи была отменена.");
-            return Result<ToDoItem>.Failure(Error.OperatinCanceled);
+            return Result<ToDoItem>.Failure(Error.OperationCanceled);
         }
         catch (DbUpdateConcurrencyException ex)
         {
