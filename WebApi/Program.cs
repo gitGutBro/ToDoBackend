@@ -1,12 +1,16 @@
 using ApplicationBackend.Dtos;
+using ApplicationBackend.Events;
 using ApplicationBackend.Mappers;
 using ApplicationBackend.Repositories;
 using ApplicationBackend.Services;
 using Domain.Entities.ToDoItem;
 using Domain.Factories;
+using Domain.Topics;
 using Domain.Validators;
 using InfrastructureBackend.Data;
+using InfrastructureBackend.Messaging;
 using InfrastructureBackend.Repositories;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -77,10 +81,34 @@ try
     builder.Services.AddHealthChecks()
         .AddNpgSql(connectionString, name: "postgres", tags: ["db", "postgres"]);
 
+    string kafkaBootstrap = builder.Configuration.GetValue<string>("Kafka:BootstrapServers") ?? "kafka:9092";
+
+    builder.Services.AddMassTransit(busConfig =>
+    {
+        // если нужно оставить InMemory bus дл€ внутренних вещей:
+        busConfig.UsingInMemory((busContext, memoryConfig) => { /* не надо ConfigureEndpoints здесь */ });
+
+        // ƒобавл€ем Rider (Kafka)
+        busConfig.AddRider(riderConfig =>
+        {
+            // –егистрируем продюсер дл€ нашего контракта и указываем им€ топика
+            riderConfig.AddProducer<ToDoItemCreatedTopic>("todo-creatings");
+            riderConfig.AddProducer<ToDoItemDeletedTopic>("todo-deletings");
+            riderConfig.AddProducer<ToDoItemUpdatedTopic>("todo-updates");
+
+            riderConfig.UsingKafka((riderContext, kafkaFactoryConfig) =>
+            {
+                kafkaFactoryConfig.Host(kafkaBootstrap);
+                // при необходимости можно добавить дополнительные параметры конфигурации тут
+            });
+        });
+    });
+
     builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
     builder.Services.AddScoped<IToDoService, ToDoService>();
     builder.Services.AddScoped<IToDoItemFactory, ToDoItemFactory>();
     builder.Services.AddScoped<IToDoItemFactory, ToDoItemFactory>();
+    builder.Services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
     builder.Services.AddTransient<ToDoItemValidator>();
     builder.Services.AddTransient<IMapper<ToDoItem, CreateToDoItemDto>, CreateToDoMapper>();
     builder.Services.AddTransient<IMapper<ToDoItem, ToDoItemDto>, ToDoItemMapper>();
