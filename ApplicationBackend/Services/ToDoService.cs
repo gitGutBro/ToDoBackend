@@ -22,7 +22,7 @@ public class ToDoService(IToDoRepository toDoRepository,
     private readonly IUpdateMapper<ToDoItem, UpdateToDoItemDto> _updateMapper = updateMapper ?? throw new ArgumentNullException(nameof(updateMapper));
 
     public async Task<Result<IEnumerable<ToDoItemDto>>> GetAllAsync(CancellationToken cancellationToken)
-    {
+    {//К
         Result<IEnumerable<ToDoItem>> itemsResult = await _toDoRepository.GetAllAsync(cancellationToken);
 
         return itemsResult.Match
